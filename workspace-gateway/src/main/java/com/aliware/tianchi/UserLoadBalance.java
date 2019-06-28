@@ -23,6 +23,6 @@ public class UserLoadBalance implements LoadBalance {
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-medium:20870/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false,
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-large:20890/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false]
         // System.out.println("ZCL-DEBUG"+Arrays.toString(invokers.toArray()));
-        return invokers.get(0);
+        return invokers.get(2);
     }
 }
