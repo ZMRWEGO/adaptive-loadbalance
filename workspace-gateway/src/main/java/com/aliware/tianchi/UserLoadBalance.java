@@ -31,10 +31,10 @@ public class UserLoadBalance implements LoadBalance {
         return invokers.get(x);
     }
     private int randomOnWeight() {
-        int[] weightArray = new int[]{200,450,650};
+        int[] weightArray = new int[]{150,450,650};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
-        map.put(200,0);
+        map.put(150,0);
         map.put(450,1);
         map.put(650,2);
         int key = 0;
