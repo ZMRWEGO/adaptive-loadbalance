@@ -26,8 +26,9 @@ public class UserLoadBalance implements LoadBalance {
         //数组中存储的分别是[interface com.aliware.tianchi.HashInterface -> dubbo://provider-small:20880/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false,
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-medium:20870/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false,
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-large:20890/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false]
-        // System.out.println("ZCL-DEBUG"+Arrays.toString(invokers.toArray()));
-        return invokers.get(randomOnWeight());
+        int x = randomOnWeight();
+         System.out.println("ZCL-DEBUG:"+x);
+        return invokers.get(x);
     }
     private int randomOnWeight() {
         int[] weightArray = new int[]{200,450,650};
