@@ -1,5 +1,10 @@
 package com.aliware.tianchi;
 
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.List;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
@@ -12,9 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author daofeng.xjf
  * <p>
- * 服务端回调服务
- * 可选接口
- * 用户可以基于此服务，实现服务端向客户端动态推送的功能
+ * 服务端回调服务 可选接口 用户可以基于此服务，实现服务端向客户端动态推送的功能
  */
 public class CallbackServiceImpl implements CallbackService {
 
@@ -25,7 +28,10 @@ public class CallbackServiceImpl implements CallbackService {
                 if (!listeners.isEmpty()) {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
-                            entry.getValue().receiveServerMsg(System.getProperty("quota") + " " + new Date().toString());
+                            //获取当前服务器活跃线程数
+                            int aliveThreads = Thread.activeCount();
+                            entry.getValue()
+                                .receiveServerMsg(System.getProperty("quota") + " " + "活跃线程数：" + aliveThreads);
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }
@@ -38,8 +44,7 @@ public class CallbackServiceImpl implements CallbackService {
     private Timer timer = new Timer();
 
     /**
-     * key: listener type
-     * value: callback listener
+     * key: listener type value: callback listener
      */
     private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
 
@@ -48,4 +53,6 @@ public class CallbackServiceImpl implements CallbackService {
         listeners.put(key, listener);
         listener.receiveServerMsg(new Date().toString()); // send notification for change
     }
+
 }
+

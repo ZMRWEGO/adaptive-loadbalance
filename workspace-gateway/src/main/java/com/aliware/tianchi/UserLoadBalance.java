@@ -1,6 +1,10 @@
 package com.aliware.tianchi;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
@@ -23,6 +27,25 @@ public class UserLoadBalance implements LoadBalance {
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-medium:20870/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false,
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-large:20890/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false]
         // System.out.println("ZCL-DEBUG"+Arrays.toString(invokers.toArray()));
-        return invokers.get(2);
+        return invokers.get(randomOnWeight());
+    }
+    private int randomOnWeight() {
+        int[] weightArray = new int[]{200,450,650};
+        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(200,0);
+        map.put(450,1);
+        map.put(650,2);
+        int key = 0;
+        for (int weight : weightArray) {
+            treeMap.put(key, weight);
+            key += weight;
+        }
+
+        Random r = new Random();
+        int num;
+        num = r.nextInt(key);
+        return map.get(treeMap.floorEntry(num).getValue());
+
     }
 }

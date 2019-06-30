@@ -26,8 +26,7 @@
 1. 手动启动 consumer container
 
     ```shell
-    docker run -ti --entrypoint=/bin/bash -p 8087:8087  registry.cn-shanghai.aliyuncs.com/aliware2019/consumer
-    ```
+:    ```
 2. 运行 `docker-entrypoint.sh`
 
     ```shell
