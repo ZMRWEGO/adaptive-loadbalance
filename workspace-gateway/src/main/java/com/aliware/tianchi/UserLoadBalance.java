@@ -1,6 +1,8 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.util.GlobalConf;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -52,7 +54,7 @@ public class UserLoadBalance implements LoadBalance {
                 GlobalConf.TIME.set(current);
                 index.getAndAdd(1);
                 int circle = index.get() + 1;
-                System.out.println("第" + circle + "次更新最大并发数");
+                System.out.println(stampToDate(current)+":第" + circle + "次更新最大并发数");
             }
             x = refresh(index);
         }
@@ -111,7 +113,7 @@ public class UserLoadBalance implements LoadBalance {
         }
         int small = GlobalConf.smallMC[index.get()];
         int medium = GlobalConf.mediumMC[index.get()];
-        int large = GlobalConf.largeMC[index.get()]+50;
+        int large = GlobalConf.largeMC[index.get()];
         int[] weightArray = {small, medium, large};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
@@ -128,7 +130,14 @@ public class UserLoadBalance implements LoadBalance {
         int num;
         num = r.nextInt(key);
         int result = map.get(treeMap.floorEntry(num).getValue());
-        // System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
+        System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
         return result;
+    }
+    public  String stampToDate(long s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(s);
+        res = simpleDateFormat.format(date);
+        return res;
     }
 }
