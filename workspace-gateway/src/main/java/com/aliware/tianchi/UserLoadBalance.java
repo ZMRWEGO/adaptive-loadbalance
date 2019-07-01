@@ -29,8 +29,6 @@ public class UserLoadBalance implements LoadBalance {
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final AtomicBoolean isFormal = new AtomicBoolean(false);
     private final AtomicInteger index = new AtomicInteger(-1);
-    private ScheduledExecutorService scheduler =
-        new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("WeightService-Refresher"));
     private int x = 2;
 
     @Override
@@ -42,9 +40,9 @@ public class UserLoadBalance implements LoadBalance {
                 if(isFormal.compareAndSet(false, true)) {
 
                     GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
-                    index.getAndAdd(1);
-                    System.out.println("预热阶段结束，第一次更新最大并发数");
-                    x = refresh(index);
+                   // index.getAndAdd(1);
+                   // System.out.println("预热阶段结束，第一次更新最大并发数");
+                    //x = refresh(index);
                 }
             } else {
                 x = randomOnWeight();
@@ -54,11 +52,11 @@ public class UserLoadBalance implements LoadBalance {
                 GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
                 index.getAndAdd(1);
                 int circle = index.get() + 1;
-                System.out.println("第" + circle + "次更新最大并发数");
+                //System.out.println("第" + circle + "次更新最大并发数");
             }
             x = refresh(index);
         }
-        System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+       // System.out.println("ZCL-DEBUG:" + x + isFormal.get());
         return invokers.get(x);
     }
 
@@ -130,7 +128,7 @@ public class UserLoadBalance implements LoadBalance {
         int num;
         num = r.nextInt(key);
         int result = map.get(treeMap.floorEntry(num).getValue());
-        System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
+       // System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
         return result;
     }
 }
