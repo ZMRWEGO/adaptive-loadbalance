@@ -16,6 +16,7 @@
             <groupId>com.aliware.tianchi</groupId>
             <artifactId>workspace-common</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

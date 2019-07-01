@@ -30,8 +30,8 @@ public class CallbackServiceImpl implements CallbackService {
                         try {
                             //获取当前服务器活跃线程数
                             int aliveThreads = Thread.activeCount();
-                            entry.getValue()
-                                .receiveServerMsg(System.getProperty("quota") + " " + "活跃线程数：" + aliveThreads);
+//                            entry.getValue()
+//                                .receiveServerMsg(System.getProperty("quota") + " " + "活跃线程数：" + aliveThreads);
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }
