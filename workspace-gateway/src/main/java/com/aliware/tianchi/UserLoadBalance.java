@@ -32,32 +32,34 @@ public class UserLoadBalance implements LoadBalance {
     private final AtomicInteger index = new AtomicInteger(-1);
     private ScheduledExecutorService scheduler =
         new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("WeightService-Refresher"));
-    private int x =2;
+    private int x = 2;
+
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         long current = System.currentTimeMillis();
         weighting(current);
         if (!isFormal.get()) {
-          if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
-              synchronized (this){
-                isFormal.compareAndSet(false, true);
-                GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
-                index.getAndAdd(1);
-                System.out.println("预热阶段结束，第一次更新最大并发数");
-                x = refresh(index);
-            } }else {
+            if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
+                if(isFormal.compareAndSet(false, true)) {
+
+                    GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
+                    index.getAndAdd(1);
+                    System.out.println("预热阶段结束，第一次更新最大并发数");
+                    x = refresh(index);
+                }
+            } else {
                 x = randomOnWeight();
             }
-        }else {
+        } else {
             if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
                 GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
                 index.getAndAdd(1);
                 int circle = index.get() + 1;
-                System.out.println("第"+circle+"次更新最大并发数");
+                System.out.println("第" + circle + "次更新最大并发数");
             }
             x = refresh(index);
         }
-        System.out.println("ZCL-DEBUG:"+x+isFormal.get());
+        System.out.println("ZCL-DEBUG:" + x + isFormal.get());
         return invokers.get(x);
     }
 
@@ -81,7 +83,7 @@ public class UserLoadBalance implements LoadBalance {
 
     }
 
-    private void weighting(long current)  {
+    private void weighting(long current) {
         //System.out.println(Thread.currentThread().getId());
         if (!init.get()) {
             if (init.compareAndSet(false, true)) {
@@ -126,7 +128,7 @@ public class UserLoadBalance implements LoadBalance {
         int num;
         num = r.nextInt(key);
         int result = map.get(treeMap.floorEntry(num).getValue());
-        System.out.println("s:"+small+" m:"+medium+" l"+large+"weight"+result);
+        System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
         return result;
     }
 }
