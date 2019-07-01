@@ -108,6 +108,9 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     private int refresh(AtomicInteger index) {
+        if (index.get() > 9) {
+            index.set(9);
+        }
         int small = GlobalConf.smallMC[index.get()];
         int medium = GlobalConf.mediumMC[index.get()];
         int large = GlobalConf.largeMC[index.get()];
