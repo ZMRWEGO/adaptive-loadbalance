@@ -28,7 +28,7 @@ public class UserLoadBalance implements LoadBalance {
 
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final AtomicBoolean isFormal = new AtomicBoolean(false);
-    private final AtomicInteger index = new AtomicInteger(-1);
+    private final AtomicInteger index = new AtomicInteger(0);
     private int x = 2;
 
     @Override
@@ -39,7 +39,7 @@ public class UserLoadBalance implements LoadBalance {
             if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
                 if (isFormal.compareAndSet(false, true)) {
 
-                    GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
+                    GlobalConf.TIME.set(current);
                     // index.getAndAdd(1);
                     // System.out.println("预热阶段结束，第一次更新最大并发数");
                     //x = refresh(index);
@@ -52,7 +52,7 @@ public class UserLoadBalance implements LoadBalance {
                 GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
                 index.getAndAdd(1);
                 int circle = index.get() + 1;
-                //System.out.println("第" + circle + "次更新最大并发数");
+                System.out.println("第" + circle + "次更新最大并发数");
             }
             x = refresh(index);
         }
