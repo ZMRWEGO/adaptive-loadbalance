@@ -38,13 +38,14 @@ public class UserLoadBalance implements LoadBalance {
         long current = System.currentTimeMillis();
         weighting(current);
         if (!isFormal.get()) {
-            if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
+          if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
+              synchronized (this){
                 isFormal.compareAndSet(false, true);
                 GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
                 index.getAndAdd(1);
                 System.out.println("预热阶段结束，第一次更新最大并发数");
                 x = refresh(index);
-            } else {
+            } }else {
                 x = randomOnWeight();
             }
         }else {
