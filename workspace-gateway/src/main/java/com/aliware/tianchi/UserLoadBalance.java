@@ -37,16 +37,16 @@ public class UserLoadBalance implements LoadBalance {
         weighting(current);
         if (!isFormal.get()) {
             if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
-                if(isFormal.compareAndSet(false, true)) {
+                if (isFormal.compareAndSet(false, true)) {
 
                     GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
-                   // index.getAndAdd(1);
-                   // System.out.println("预热阶段结束，第一次更新最大并发数");
+                    // index.getAndAdd(1);
+                    // System.out.println("预热阶段结束，第一次更新最大并发数");
                     //x = refresh(index);
                 }
-            } else {
-                x = randomOnWeight();
             }
+            x = randomOnWeight();
+
         } else {
             if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
                 GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
@@ -56,7 +56,7 @@ public class UserLoadBalance implements LoadBalance {
             }
             x = refresh(index);
         }
-       // System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+        // System.out.println("ZCL-DEBUG:" + x + isFormal.get());
         return invokers.get(x);
     }
 
@@ -128,7 +128,7 @@ public class UserLoadBalance implements LoadBalance {
         int num;
         num = r.nextInt(key);
         int result = map.get(treeMap.floorEntry(num).getValue());
-       // System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
+        // System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
         return result;
     }
 }
