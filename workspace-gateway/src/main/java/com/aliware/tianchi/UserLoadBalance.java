@@ -1,6 +1,8 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.util.GlobalConf;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -25,7 +27,6 @@ import java.util.List;
  * 负载均衡扩展接口 必选接口，核心接口 此类可以修改实现，不可以移动类或者修改包名 选手需要基于此类实现自己的负载均衡算法
  */
 public class UserLoadBalance implements LoadBalance {
-
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final AtomicBoolean isFormal = new AtomicBoolean(false);
     private final AtomicInteger index = new AtomicInteger(-1);
@@ -39,11 +40,11 @@ public class UserLoadBalance implements LoadBalance {
         weighting(current);
         if (!isFormal.get()) {
             if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
-                if(isFormal.compareAndSet(false, true)) {
-
-                    GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
+                if (isFormal.compareAndSet(false, true)) {
+                    GlobalConf.TIME.compareAndSet(GlobalConf.LAST, current);
+                    GlobalConf.LAST = GlobalConf.TIME.get();
                     index.getAndAdd(1);
-                    System.out.println("预热阶段结束，第一次更新最大并发数");
+                    System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
                     x = refresh(index);
                 }
             } else {
@@ -51,10 +52,12 @@ public class UserLoadBalance implements LoadBalance {
             }
         } else {
             if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
-                GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
-                index.getAndAdd(1);
-                int circle = index.get() + 1;
-                System.out.println("第" + circle + "次更新最大并发数");
+                if (GlobalConf.TIME.compareAndSet(GlobalConf.LAST, current)) {
+                    GlobalConf.LAST = current;
+                    index.getAndAdd(1);
+                    int circle = index.get() + 1;
+                    System.out.println(stampToDate(current)+":第" + circle + "次更新最大并发数");
+                }
             }
             x = refresh(index);
         }
@@ -87,6 +90,7 @@ public class UserLoadBalance implements LoadBalance {
         if (!init.get()) {
             if (init.compareAndSet(false, true)) {
                 GlobalConf.TIME = new AtomicLong(System.currentTimeMillis());
+                GlobalConf.LAST = GlobalConf.TIME.get();
             }
         }
 //        获取json
@@ -108,6 +112,9 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     private int refresh(AtomicInteger index) {
+        if (index.get() > 9) {
+            return randomOnWeight();
+        }
         int small = GlobalConf.smallMC[index.get()];
         int medium = GlobalConf.mediumMC[index.get()];
         int large = GlobalConf.largeMC[index.get()];
@@ -129,5 +136,12 @@ public class UserLoadBalance implements LoadBalance {
         int result = map.get(treeMap.floorEntry(num).getValue());
         System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
         return result;
+    }
+    public  String stampToDate(long s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(s);
+        res = simpleDateFormat.format(date);
+        return res;
     }
 }
