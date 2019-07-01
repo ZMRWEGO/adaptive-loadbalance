@@ -27,15 +27,15 @@ public class UserLoadBalance implements LoadBalance {
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-medium:20870/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false,
         // interface com.aliware.tianchi.HashInterface -> dubbo://provider-large:20890/com.aliware.tianchi.HashInterface?async=true&heartbeat=0&loadbalance=user&reconnect=false]
         int x = randomOnWeight();
-         System.out.println("ZCL-DEBUG:"+x);
+         //System.out.println("ZCL-DEBUG:"+x);
         return invokers.get(x);
     }
     private int randomOnWeight() {
-        int[] weightArray = new int[]{150,450,650};
+        int[] weightArray = new int[]{150,500,650};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
         map.put(150,0);
-        map.put(450,1);
+        map.put(500,1);
         map.put(650,2);
         int key = 0;
         for (int weight : weightArray) {
