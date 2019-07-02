@@ -35,31 +35,31 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        long current = System.currentTimeMillis();
-        weighting(current);
-        if (!isFormal.get()) {
-            if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
-                if (isFormal.compareAndSet(false, true)) {
-
-                    GlobalConf.TIME.set(current);
-                    // index.getAndAdd(1);
-                     System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
-                    //x = refresh(index);
-                }
-            }
-            x = randomOnWeight();
-
-        } else {
-            if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
-                GlobalConf.TIME.set(current);
-                index.getAndAdd(1);
-                int circle = index.get() + 1;
-                System.out.println(stampToDate(current)+":第" + circle + "次更新最大并发数");
-            }
-            x = refresh(index);
-        }
+//        long current = System.currentTimeMillis();
+//        weighting(current);
+//        if (!isFormal.get()) {
+//            if ((current - GlobalConf.TIME.get()) / 1000 >= 30) {
+//                if (isFormal.compareAndSet(false, true)) {
+//
+//                    GlobalConf.TIME.set(current);
+//                    // index.getAndAdd(1);
+//                     System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
+//                    //x = refresh(index);
+//                }
+//            }
+//            x = randomOnWeight();
+//
+//        } else {
+//            if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
+//                GlobalConf.TIME.set(current);
+//                index.getAndAdd(1);
+//                int circle = index.get() + 1;
+//                System.out.println(stampToDate(current)+":第" + circle + "次更新最大并发数");
+//            }
+//            x = refresh(index);
+//        }
         //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-        return invokers.get(x);
+        return invokers.get(randomOnWeight());
     }
 
     private int randomOnWeight() {
