@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GlobalConf {
 
-    public static int[] smallMC = {170, 170, 170, 170, 170, 170, 170, 170, 170, 170};
+    public static int[] smallMC = {150, 150, 150, 150, 150, 150, 150, 150, 150, 150};
     public static int[] mediumMC = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500};
     public static int[] largeMC = {650, 650, 650, 650, 650, 650, 650, 650, 650, 650};
     public static int PROVIDER;
