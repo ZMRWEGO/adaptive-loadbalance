@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GlobalConf {
 
-    public static int[] smallMC = {109, 100, 108, 147, 121, 136, 101, 110, 116, 135};
-    public static int[] mediumMC = {411, 392, 331, 400, 370, 370, 418, 379, 345, 355};
-    public static int[] largeMC = {504, 484, 535, 512, 480, 518, 505, 500, 520, 500};
+    public static int[] smallMC = {150, 150, 150, 150, 150, 150, 150, 150, 150, 150};
+    public static int[] mediumMC = {470, 470, 500, 500, 500, 500, 500, 500, 470, 470};
+    public static int[] largeMC = {650, 650, 650, 650, 650, 650, 620, 620, 650, 650};
     public static int PROVIDER;
     public static AtomicLong TIME;
 }
