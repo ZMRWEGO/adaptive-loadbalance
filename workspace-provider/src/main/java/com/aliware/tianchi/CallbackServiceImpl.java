@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CallbackServiceImpl implements CallbackService {
 
+    Map<String, String> map = new ConcurrentHashMap<>();
+
     public CallbackServiceImpl() {
         timer.schedule(new TimerTask() {
             @Override
@@ -28,17 +30,20 @@ public class CallbackServiceImpl implements CallbackService {
                 if (!listeners.isEmpty()) {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
-                            //获取当前服务器活跃线程数
-                            int aliveThreads = Thread.activeCount();
-//                            entry.getValue()
-//                                .receiveServerMsg(System.getProperty("quota") + " " + "活跃线程数：" + aliveThreads);
+                            map.put("name", System.getProperty("quota"));
+                            map.put("cost_time", GlobalConf.COST_TIME.toString());
+                            //map.put("active_tasks", GlobalConf.ACTIVE_TASKS.toString());
+                            //map.put("request", GlobalConf.REQUEST);
+                            map.put("response", GlobalConf.RESPONSE);
+                            entry.getValue()
+                                .receiveServerMsg(map.toString());
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }
                     }
                 }
             }
-        }, 0, 5000);
+        }, 0, 10);
     }
 
     private Timer timer = new Timer();

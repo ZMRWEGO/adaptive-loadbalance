@@ -28,93 +28,18 @@ import java.util.List;
  */
 public class UserLoadBalance implements LoadBalance {
 
-    private final AtomicBoolean init = new AtomicBoolean(false);
-    private final AtomicBoolean isFormal = new AtomicBoolean(false);
-    private final AtomicInteger index = new AtomicInteger(0);
-    private int x = 2;
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        long current = System.currentTimeMillis();
-        weighting(current);
-        if (!isFormal.get()) {
-            if ((current - GlobalConf.TIME.get()) >= 29000) {
-                if (isFormal.compareAndSet(false, true)) {
-
-                    GlobalConf.TIME.set(current);
-                    // index.getAndAdd(1);
-                     System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
-                    //x = refresh(index);
-                }
-            }
-            x = randomOnWeight();
-
-        } else {
-            if (isFormal.get() && (current - GlobalConf.TIME.get()) >=6000) {
-                GlobalConf.TIME.set(current);
-                index.getAndAdd(1);
-                int circle = index.get() + 1;
-                System.out.println(stampToDate(current)+":第" + circle + "次更新最大并发数");
-            }
-            x = refresh(index);
-        }
-        //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-        return invokers.get(x);
+        refresh();
+        return invokers.get(randomOnWeight(GlobalConf.WEIGHT));
     }
 
-    private int randomOnWeight() {
-        int[] weightArray = new int[]{150, 500, 650};
-        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(150, 0);
-        map.put(500, 1);
-        map.put(650, 2);
-        int key = 0;
-        for (int weight : weightArray) {
-            treeMap.put(key, weight);
-            key += weight;
-        }
-
-        Random r = new Random();
-        int num;
-        num = r.nextInt(key);
-        return map.get(treeMap.floorEntry(num).getValue());
-
-    }
-
-    private void weighting(long current) {
-        //System.out.println(Thread.currentThread().getId());
-        if (!init.get()) {
-            if (init.compareAndSet(false, true)) {
-                GlobalConf.TIME = new AtomicLong(System.currentTimeMillis());
-            }
-        }
-//        获取json
-//        if (!init.get()) {
-//            if (init.compareAndSet(false, true)) {
-//                //这里不自行加载json，改为数组
-//                //执行定时任务设置权重
-//                int startTime = 30;
-//                for ( index = 0; index <GlobalConf.smallMC.length ; index++) {
-//
-//                    scheduler.schedule(() -> refresh(GlobalConf.smallMC[index],
-//                        GlobalConf.mediumMC[index], GlobalConf.largeMC[index]), startTime, TimeUnit.SECONDS);
-//                    startTime += 6;
-//                    System.out.println("执行第"+index+"次");
-//                }
-//            }
-//
-//        }
-    }
-
-    private int refresh(AtomicInteger index) {
-        if (index.get() > 9) {
-            index.set(9);
-        }
-        int small = Double.valueOf(GlobalConf.smallMC[index.get()]/GlobalConf.smallRT[index.get()]*1000).intValue();
-        int medium = Double.valueOf(GlobalConf.mediumMC[index.get()]/GlobalConf.mediumRT[index.get()]*1000).intValue();
-        int large = Double.valueOf(GlobalConf.largeMC[index.get()]/GlobalConf.largeRT[index.get()]*1000).intValue();
-        int[] weightArray = {small, medium, large};
+    private int randomOnWeight(int index) {
+        int small = GlobalConf.smallMC[index];
+        int large = GlobalConf.largeMC[index];
+        int medium = GlobalConf.mediumMC[index];
+        int[] weightArray = new int[]{small, medium, large};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
         map.put(small, 0);
@@ -129,15 +54,41 @@ public class UserLoadBalance implements LoadBalance {
         Random r = new Random();
         int num;
         num = r.nextInt(key);
-        int result = map.get(treeMap.floorEntry(num).getValue());
-        System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
-        return result;
+        return map.get(treeMap.floorEntry(num).getValue());
+
     }
-    public  String stampToDate(long s){
+
+    public String stampToDate(long s) {
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(s);
         res = simpleDateFormat.format(date);
         return res;
     }
+
+    public void refresh() {
+        System.out.println("执行更新");
+        //每0.1s刷新一次权重
+        if (GlobalConf.largeException.get()) {
+            if (GlobalConf.largeException.compareAndSet(true, false)) {
+                GlobalConf.WEIGHT = 2;
+                System.out.println("刷新权重为2");
+            }
+        } else if (GlobalConf.smallException.get()) {
+            if (GlobalConf.smallException.compareAndSet(true, false)) {
+                GlobalConf.WEIGHT = 0;
+                System.out.println("刷新权重为0");
+            }
+        } else if (GlobalConf.mediumException.get()) {
+            if (GlobalConf.mediumException.compareAndSet(true, false)) {
+                GlobalConf.WEIGHT = 1;
+                System.out.println("刷新权重为1");
+            }
+        }else {
+//            System.out.println("保持");
+        }
+    }
+
 }
+
+
