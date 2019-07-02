@@ -43,7 +43,7 @@ public class UserLoadBalance implements LoadBalance {
 
                     GlobalConf.TIME.set(current);
                     // index.getAndAdd(1);
-                    // System.out.println("预热阶段结束，第一次更新最大并发数");
+                     System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
                     //x = refresh(index);
                 }
             }
@@ -58,7 +58,7 @@ public class UserLoadBalance implements LoadBalance {
             }
             x = refresh(index);
         }
-        System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+        //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
         return invokers.get(x);
     }
 
