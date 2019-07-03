@@ -12,7 +12,7 @@ public class CallbackListenerImpl implements CallbackListener {
 
     @Override
     public void receiveServerMsg(String msg) {
-        System.out.println("receive msg from server :" + msg+ MyConf.NUM.getAndAdd(1));
+        System.out.println("receive msg from server :" + msg);
 //        String[] s1 = msg.split(",");
 //        if (s1.length == 4) {
 //            String name = s1[3].split("=")[1];

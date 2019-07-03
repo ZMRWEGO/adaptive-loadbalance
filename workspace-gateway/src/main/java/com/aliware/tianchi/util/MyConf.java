@@ -12,13 +12,16 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MyConf {
 
-    public static int[] smallMC = {150, 200, 200, 200};
-    public static int[] mediumMC = {500, 450, 500, 450};
-    public static int[] largeMC = {650, 650, 600, 650};
-    public static AtomicBoolean smallException = new AtomicBoolean(false);
-    public static AtomicBoolean mediumException = new AtomicBoolean(false);
-    public static AtomicBoolean largeException = new AtomicBoolean(false);
-    public static AtomicInteger NUM = new AtomicInteger(0);
+    public static int[] smallMC = {130, 200, 200, 150};
+    public static int[] mediumMC = {500, 430, 500, 500};
+    public static int[] largeMC = {650, 650, 530, 650};
+    public static AtomicLong smallSumTime = new AtomicLong(0);
+    public static AtomicLong mediumSumTime = new AtomicLong(0);
+    public static AtomicLong largeSumTime = new AtomicLong(0);
+    public static AtomicInteger smallNUM = new AtomicInteger(0);
+    public static AtomicInteger mediumNUM = new AtomicInteger(0);
+    public static AtomicInteger largeNUM = new AtomicInteger(0);
     public static int WEIGHT=3;
+    public static AtomicLong TIME = new AtomicLong(0);
     public static AtomicBoolean EXCEPTION = new AtomicBoolean(false);
 }

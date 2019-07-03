@@ -18,9 +18,12 @@ import org.apache.dubbo.rpc.RpcException;
  */
 @Activate(group = Constants.CONSUMER)
 public class TestClientFilter implements Filter {
+
+    long current ;
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            current = System.currentTimeMillis();
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
@@ -32,11 +35,23 @@ public class TestClientFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
-        String s = result.toString().split("=")[2];
-        String exception = s.substring(0, s.length() - 1);
-        if (!exception.equals("null")){
-            MyConf.EXCEPTION.compareAndSet(false, true);
+        long time = System.currentTimeMillis() - current;
+        switch (invoker.getUrl().getHost()) {
+            case "provider-small": {
+                MyConf.smallSumTime.getAndAdd(time);
+                MyConf.smallNUM.getAndAdd(1);
+
+            }
+            case "provider-medium":{
+                MyConf.mediumSumTime.getAndAdd(time);
+                MyConf.mediumNUM.getAndAdd(1);
+            }
+            case "provider-large": {
+                MyConf.largeSumTime.getAndAdd(time);
+                MyConf.largeNUM.getAndAdd(1);
+            }
         }
+
 
 
         return result;

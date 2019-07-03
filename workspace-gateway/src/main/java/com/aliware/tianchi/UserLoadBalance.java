@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.AsyncRpcResult;
 import org.apache.dubbo.rpc.Invocation;
@@ -25,32 +26,89 @@ import java.util.List;
  */
 public class UserLoadBalance implements LoadBalance {
 
-     private  MyList circle ;
     private final AtomicBoolean init = new AtomicBoolean(false);
-    private final AtomicInteger x = new AtomicInteger(0);
+    private final AtomicBoolean isFormal = new AtomicBoolean(false);
+    private final AtomicInteger index = new AtomicInteger(0);
+    private int x = 2;
+
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        //refresh();
-        if (!init.get()) {
-            init.compareAndSet(false, true);
-            setCircle();
-        } else {
-            if(MyConf.EXCEPTION.get()){
-                if (MyConf.EXCEPTION.compareAndSet(true, false)) {
-                    circle = circle.next;
-                    x.set(circle.value);
+        long current = System.currentTimeMillis();
+        weighting(current);
+        if (!isFormal.get()) {
+            if ((current - MyConf.TIME.get()) / 1000 >= 30) {
+                if (isFormal.compareAndSet(false, true)) {
+
+                    MyConf.TIME.set(current);
+                    // index.getAndAdd(1);
+                    System.out.println(stampToDate(current) + ":预热阶段结束，第一次更新最大并发数");
+                    //x = refresh(index);
                 }
             }
+            x = randomOnWeight();
+
+        } else {
+            if ((current - MyConf.TIME.get()) / 1000 >= 1) {
+                MyConf.TIME.set(current);
+
+                getIndex();
+            }
+            x = refresh();
         }
-        System.out.println("zcl:weight:"+x);
-        return invokers.get(x.get());
+        //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+        return invokers.get(x);
     }
 
-    private int randomOnWeight(int index) {
-        int small = MyConf.smallMC[index];
-        int large = MyConf.largeMC[index];
-        int medium = MyConf.mediumMC[index];
-        int[] weightArray = new int[]{small, medium, large};
+    private int randomOnWeight() {
+        int[] weightArray = new int[]{150, 500, 650};
+        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(150, 0);
+        map.put(500, 1);
+        map.put(650, 2);
+        int key = 0;
+        for (int weight : weightArray) {
+            treeMap.put(key, weight);
+            key += weight;
+        }
+
+        Random r = new Random();
+        int num;
+        num = r.nextInt(key);
+        return map.get(treeMap.floorEntry(num).getValue());
+
+    }
+
+    private void weighting(long current) {
+        //System.out.println(Thread.currentThread().getId());
+        if (!init.get()) {
+            if (init.compareAndSet(false, true)) {
+                MyConf.TIME = new AtomicLong(System.currentTimeMillis());
+            }
+        }
+//        获取json
+//        if (!init.get()) {
+//            if (init.compareAndSet(false, true)) {
+//                //这里不自行加载json，改为数组
+//                //执行定时任务设置权重
+//                int startTime = 30;
+//                for ( index = 0; index <GlobalConf.smallMC.length ; index++) {
+//
+//                    scheduler.schedule(() -> refresh(GlobalConf.smallMC[index],
+//                        GlobalConf.mediumMC[index], GlobalConf.largeMC[index]), startTime, TimeUnit.SECONDS);
+//                    startTime += 6;
+//                    System.out.println("执行第"+index+"次");
+//                }
+//            }
+//
+//        }
+    }
+
+    private int refresh() {
+        int small = MyConf.smallMC[index.get()];
+        int medium = MyConf.mediumMC[index.get()];
+        int large = MyConf.largeMC[index.get()];
+        int[] weightArray = {small, medium, large};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
         map.put(small, 0);
@@ -65,8 +123,34 @@ public class UserLoadBalance implements LoadBalance {
         Random r = new Random();
         int num;
         num = r.nextInt(key);
-        return map.get(treeMap.floorEntry(num).getValue());
+        int result = map.get(treeMap.floorEntry(num).getValue());
+        //System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
+        return result;
+    }
 
+    public void getIndex() {
+        long small = MyConf.smallSumTime.get() / MyConf.smallNUM.get();
+        long medium = MyConf.mediumSumTime.get() / MyConf.mediumNUM.get();
+        long large = MyConf.largeSumTime.get() / MyConf.largeNUM.get();
+        System.out.println(small+" -"+medium+"-"+large);
+        if (small > Math.max(large,medium)) {
+            index.set(0);
+            System.out.println("更新到small");
+        } else if (medium > Math.max(large,small)) {
+            index.set(1);
+            System.out.println("更新到medium");
+        } else if (large > Math.max(small,medium)) {
+            index.set(2);
+            System.out.println("更新到large");
+        } else {
+
+        }
+        MyConf.smallSumTime.set(0);
+        MyConf.largeSumTime.set(0);
+        MyConf.mediumSumTime.set(0);
+        MyConf.smallNUM.set(1);
+        MyConf.mediumNUM.set(1);
+        MyConf.largeNUM.set(1);
     }
 
     public String stampToDate(long s) {
@@ -76,13 +160,4 @@ public class UserLoadBalance implements LoadBalance {
         res = simpleDateFormat.format(date);
         return res;
     }
-
-    public void setCircle(){
-        circle = new MyList(0);
-        circle.add(1).add(2);
-        circle.next.next.next = circle;
-    }
-
 }
-
-
