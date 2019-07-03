@@ -56,7 +56,7 @@ public class UserLoadBalance implements LoadBalance {
             x = refresh();
         }
         //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-        return invokers.get(randomOnWeight());
+        return invokers.get(x);
     }
 
     private int randomOnWeight() {
@@ -129,9 +129,9 @@ public class UserLoadBalance implements LoadBalance {
     }
 
     public void getIndex() {
-        long small = MyConf.smallSumTime.get() / MyConf.smallNUM.get();
-        long medium = MyConf.mediumSumTime.get() / MyConf.mediumNUM.get();
-        long large = MyConf.largeSumTime.get() / MyConf.largeNUM.get();
+        long small =  MyConf.smallNUM.get();
+        long medium =  MyConf.mediumNUM.get();
+        long large = MyConf.largeNUM.get();
         System.out.println(small+" -"+medium+"-"+large);
         if (small > Math.max(large,medium)) {
             index.set(0);
@@ -145,9 +145,6 @@ public class UserLoadBalance implements LoadBalance {
         } else {
 
         }
-        MyConf.smallSumTime.set(0);
-        MyConf.largeSumTime.set(0);
-        MyConf.mediumSumTime.set(0);
         MyConf.smallNUM.set(1);
         MyConf.mediumNUM.set(1);
         MyConf.largeNUM.set(1);

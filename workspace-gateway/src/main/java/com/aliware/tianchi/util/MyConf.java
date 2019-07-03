@@ -18,10 +18,12 @@ public class MyConf {
     public static AtomicLong smallSumTime = new AtomicLong(0);
     public static AtomicLong mediumSumTime = new AtomicLong(0);
     public static AtomicLong largeSumTime = new AtomicLong(0);
-    public static AtomicInteger smallNUM = new AtomicInteger(1);
-    public static AtomicInteger mediumNUM = new AtomicInteger(1);
-    public static AtomicInteger largeNUM = new AtomicInteger(1);
+    public static AtomicInteger smallNUM = new AtomicInteger(0);
+    public static AtomicInteger mediumNUM = new AtomicInteger(0);
+    public static AtomicInteger largeNUM = new AtomicInteger(0);
     public static int WEIGHT=3;
     public static AtomicLong TIME = new AtomicLong(0);
-    public static AtomicBoolean EXCEPTION = new AtomicBoolean(false);
+    public static AtomicBoolean smallEXCEPTION = new AtomicBoolean(false);
+    public static AtomicBoolean mediumEXCEPTION = new AtomicBoolean(false);
+    public static AtomicBoolean largeEXCEPTION = new AtomicBoolean(false);
 }
