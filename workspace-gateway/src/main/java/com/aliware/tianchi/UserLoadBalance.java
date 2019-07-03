@@ -56,7 +56,7 @@ public class UserLoadBalance implements LoadBalance {
             x = refresh();
         }
         //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-        return invokers.get(x);
+        return invokers.get(randomOnWeight());
     }
 
     private int randomOnWeight() {

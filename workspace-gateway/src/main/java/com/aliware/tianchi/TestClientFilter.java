@@ -52,7 +52,7 @@ public class TestClientFilter implements Filter {
             }
         }
 
-
+        System.out.println(invoker.getUrl().getHost()+""+time);
 
         return result;
     }
