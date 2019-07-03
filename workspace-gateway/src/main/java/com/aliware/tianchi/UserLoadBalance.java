@@ -1,12 +1,15 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.util.MyConf;
+import com.aliware.tianchi.util.MyList;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.AsyncRpcResult;
 import org.apache.dubbo.rpc.Invocation;
@@ -22,11 +25,25 @@ import java.util.List;
  */
 public class UserLoadBalance implements LoadBalance {
 
-
+     private  MyList circle ;
+    private final AtomicBoolean init = new AtomicBoolean(false);
+    private final AtomicInteger x = new AtomicInteger(0);
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         //refresh();
-        return invokers.get(randomOnWeight(MyConf.WEIGHT));
+        if (!init.get()) {
+            init.compareAndSet(false, true);
+            setCircle();
+        } else {
+            if(MyConf.EXCEPTION.get()){
+                if (MyConf.EXCEPTION.compareAndSet(true, false)) {
+                    circle = circle.next;
+                    x.set(circle.value);
+                }
+            }
+        }
+        System.out.println("zcl:weight:"+x);
+        return invokers.get(x.get());
     }
 
     private int randomOnWeight(int index) {
@@ -60,27 +77,10 @@ public class UserLoadBalance implements LoadBalance {
         return res;
     }
 
-    public void refresh() {
-        System.out.println("执行更新");
-        //每1ms刷新一次权重
-        if (MyConf.largeException.get()) {
-            if (MyConf.largeException.compareAndSet(true, false)) {
-                MyConf.WEIGHT = 2;
-                System.out.println("刷新权重为2");
-            }
-        } else if (MyConf.smallException.get()) {
-            if (MyConf.smallException.compareAndSet(true, false)) {
-                MyConf.WEIGHT = 0;
-                System.out.println("刷新权重为0");
-            }
-        } else if (MyConf.mediumException.get()) {
-            if (MyConf.mediumException.compareAndSet(true, false)) {
-                MyConf.WEIGHT = 1;
-                System.out.println("刷新权重为1");
-            }
-        }else {
-//            System.out.println("保持");
-        }
+    public void setCircle(){
+        circle = new MyList(0);
+        circle.add(1).add(2);
+        circle.next.next.next = circle;
     }
 
 }

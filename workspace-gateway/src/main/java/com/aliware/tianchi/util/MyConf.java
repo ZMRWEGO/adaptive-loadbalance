@@ -20,4 +20,5 @@ public class MyConf {
     public static AtomicBoolean largeException = new AtomicBoolean(false);
     public static AtomicInteger NUM = new AtomicInteger(0);
     public static int WEIGHT=3;
+    public static AtomicBoolean EXCEPTION = new AtomicBoolean(false);
 }

@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.util.MyConf;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
@@ -30,6 +31,14 @@ public class TestClientFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        //解析Result  RpcResult [result=-870665090, exception=null]
+        String s = result.toString().split("=")[2];
+        String exception = s.substring(0, s.length() - 1);
+        if (!exception.equals("null")){
+            MyConf.EXCEPTION.compareAndSet(false, true);
+        }
+
+
         return result;
     }
 }

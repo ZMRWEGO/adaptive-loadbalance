@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -9,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MyConf {
 
-    public static Long COST_TIME;
+    public static LinkedList<Integer> queue = new LinkedList<>();
+
     public static AtomicInteger Exceptions;
     public static String RESPONSE;
     public static String REQUEST;

@@ -37,7 +37,6 @@ public class TestServerFilter implements Filter {
         MyConf.RESPONSE = result.toString();
         //解析出来exception
 
-        MyConf.COST_TIME = System.currentTimeMillis() - startTime;
         return result;
     }
 
