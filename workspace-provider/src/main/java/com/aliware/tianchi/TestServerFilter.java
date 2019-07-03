@@ -35,7 +35,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         MyConf.RESPONSE = result.toString();
-        //String tmp = result.toString().split(",")[1];
+        //解析出来exception
 
         MyConf.COST_TIME = System.currentTimeMillis() - startTime;
         return result;

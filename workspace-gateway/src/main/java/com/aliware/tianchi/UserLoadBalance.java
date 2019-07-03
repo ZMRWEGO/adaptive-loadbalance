@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import org.apache.dubbo.common.URL;
+import org.apache.dubbo.rpc.AsyncRpcResult;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
@@ -24,7 +25,7 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        refresh();
+        //refresh();
         return invokers.get(randomOnWeight(MyConf.WEIGHT));
     }
 
