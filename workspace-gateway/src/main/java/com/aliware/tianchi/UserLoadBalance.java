@@ -1,20 +1,13 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.util.GlobalConf;
+import com.aliware.tianchi.util.MyConf;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import org.apache.dubbo.common.URL;
-import org.apache.dubbo.common.utils.NamedThreadFactory;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
@@ -32,13 +25,13 @@ public class UserLoadBalance implements LoadBalance {
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         refresh();
-        return invokers.get(randomOnWeight(GlobalConf.WEIGHT));
+        return invokers.get(randomOnWeight(MyConf.WEIGHT));
     }
 
     private int randomOnWeight(int index) {
-        int small = GlobalConf.smallMC[index];
-        int large = GlobalConf.largeMC[index];
-        int medium = GlobalConf.mediumMC[index];
+        int small = MyConf.smallMC[index];
+        int large = MyConf.largeMC[index];
+        int medium = MyConf.mediumMC[index];
         int[] weightArray = new int[]{small, medium, large};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
@@ -68,20 +61,20 @@ public class UserLoadBalance implements LoadBalance {
 
     public void refresh() {
         System.out.println("执行更新");
-        //每0.1s刷新一次权重
-        if (GlobalConf.largeException.get()) {
-            if (GlobalConf.largeException.compareAndSet(true, false)) {
-                GlobalConf.WEIGHT = 2;
+        //每1ms刷新一次权重
+        if (MyConf.largeException.get()) {
+            if (MyConf.largeException.compareAndSet(true, false)) {
+                MyConf.WEIGHT = 2;
                 System.out.println("刷新权重为2");
             }
-        } else if (GlobalConf.smallException.get()) {
-            if (GlobalConf.smallException.compareAndSet(true, false)) {
-                GlobalConf.WEIGHT = 0;
+        } else if (MyConf.smallException.get()) {
+            if (MyConf.smallException.compareAndSet(true, false)) {
+                MyConf.WEIGHT = 0;
                 System.out.println("刷新权重为0");
             }
-        } else if (GlobalConf.mediumException.get()) {
-            if (GlobalConf.mediumException.compareAndSet(true, false)) {
-                GlobalConf.WEIGHT = 1;
+        } else if (MyConf.mediumException.get()) {
+            if (MyConf.mediumException.compareAndSet(true, false)) {
+                MyConf.WEIGHT = 1;
                 System.out.println("刷新权重为1");
             }
         }else {

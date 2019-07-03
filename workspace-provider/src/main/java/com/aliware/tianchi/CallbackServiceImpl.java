@@ -1,10 +1,5 @@
 package com.aliware.tianchi;
 
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
@@ -31,10 +26,10 @@ public class CallbackServiceImpl implements CallbackService {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
                             map.put("name", System.getProperty("quota"));
-                            map.put("cost_time", GlobalConf.COST_TIME.toString());
-                            //map.put("active_tasks", GlobalConf.ACTIVE_TASKS.toString());
-                            //map.put("request", GlobalConf.REQUEST);
-                            map.put("response", GlobalConf.RESPONSE);
+                            map.put("cost_time", MyConf.COST_TIME.toString());
+                            //map.put("active_tasks", MyConf.ACTIVE_TASKS.toString());
+                            //map.put("request", MyConf.REQUEST);
+                            map.put("response", MyConf.RESPONSE);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());
                         } catch (Throwable t1) {
@@ -43,7 +38,7 @@ public class CallbackServiceImpl implements CallbackService {
                     }
                 }
             }
-        }, 0, 10);
+        }, 0, 1);
     }
 
     private Timer timer = new Timer();

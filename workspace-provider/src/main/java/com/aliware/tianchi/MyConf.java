@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 1.0
  * @date 2019/7/2 17:03
  */
-public class GlobalConf {
+public class MyConf {
 
     public static Long COST_TIME;
     public static AtomicInteger Exceptions;

@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version 1.0
  * @date 2019/7/1 11:15
  */
-public class GlobalConf {
+public class MyConf {
 
     public static int[] smallMC = {150, 200, 200, 200};
     public static int[] mediumMC = {500, 450, 500, 450};

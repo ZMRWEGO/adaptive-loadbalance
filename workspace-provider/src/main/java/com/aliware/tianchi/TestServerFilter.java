@@ -34,10 +34,10 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-        GlobalConf.RESPONSE = result.toString();
+        MyConf.RESPONSE = result.toString();
         //String tmp = result.toString().split(",")[1];
 
-        GlobalConf.COST_TIME = System.currentTimeMillis() - startTime;
+        MyConf.COST_TIME = System.currentTimeMillis() - startTime;
         return result;
     }
 
