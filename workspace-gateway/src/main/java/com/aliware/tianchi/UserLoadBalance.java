@@ -48,7 +48,8 @@ public class UserLoadBalance implements LoadBalance {
             x = randomOnWeight();
 
         } else {
-            if ((current - MyConf.TIME.get()) / 1000 >= 1) {
+            //防止并发情况出现问题
+            if (isFormal.get()&&(current - MyConf.TIME.get()) / 1000 >= 1) {
                 MyConf.TIME.set(current);
 
                 getIndex();
@@ -143,7 +144,7 @@ public class UserLoadBalance implements LoadBalance {
             index.set(2);
             System.out.println("更新到large");
         } else {
-
+            System.out.println("未更新");
         }
         MyConf.smallNUM.set(1);
         MyConf.mediumNUM.set(1);
