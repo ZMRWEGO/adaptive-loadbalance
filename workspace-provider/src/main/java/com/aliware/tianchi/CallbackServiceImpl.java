@@ -26,9 +26,9 @@ public class CallbackServiceImpl implements CallbackService {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
                             map.put("name", System.getProperty("quota"));
-                            map.put("cost_time", MyConf.COST_TIME.toString());
+                           // map.put("cost_time", MyConf.COST_TIME.toString());
                             //map.put("active_tasks", MyConf.ACTIVE_TASKS.toString());
-                            //map.put("request", MyConf.REQUEST);
+                            map.put("request", MyConf.REQUEST);
                             map.put("response", MyConf.RESPONSE);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());
@@ -38,7 +38,7 @@ public class CallbackServiceImpl implements CallbackService {
                     }
                 }
             }
-        }, 0, 5000);
+        }, 0, 100);
     }
 
     private Timer timer = new Timer();
