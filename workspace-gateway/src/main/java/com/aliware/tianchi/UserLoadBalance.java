@@ -49,14 +49,14 @@ public class UserLoadBalance implements LoadBalance {
 
         } else {
             if (isFormal.get() && (current - GlobalConf.TIME.get()) / 1000 >= 6) {
-                GlobalConf.TIME.set(current);
+                GlobalConf.TIME.compareAndSet(GlobalConf.TIME.get(), current);
                 index.getAndAdd(1);
                 int circle = index.get() + 1;
                 System.out.println("第" + circle + "次更新最大并发数");
             }
             x = refresh(index);
         }
-        System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+        // System.out.println("ZCL-DEBUG:" + x + isFormal.get());
         return invokers.get(x);
     }
 
@@ -111,7 +111,7 @@ public class UserLoadBalance implements LoadBalance {
         }
         int small = GlobalConf.smallMC[index.get()];
         int medium = GlobalConf.mediumMC[index.get()];
-        int large = GlobalConf.largeMC[index.get()]+50;
+        int large = GlobalConf.largeMC[index.get()];
         int[] weightArray = {small, medium, large};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
