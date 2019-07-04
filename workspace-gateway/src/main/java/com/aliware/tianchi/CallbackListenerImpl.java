@@ -1,6 +1,5 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.util.MyConf;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
 /**

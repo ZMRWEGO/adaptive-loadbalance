@@ -1,6 +1,5 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.util.MyConf;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
@@ -39,24 +38,24 @@ public class TestClientFilter implements Filter {
         String s = result.toString().split("=")[2];
         String exception = s.substring(0, s.length() - 1);
         //System.out.println(exception);
-        switch (invoker.getUrl().getHost()) {
-            case "provider-small": {
-                if (!exception.equals("null")){
-                    MyConf.smallNUM.getAndAdd(1);
-                }
-
-            }
-            case "provider-medium":{
-                if (!exception.equals("null")){
-                    MyConf.mediumNUM.getAndAdd(1);
-                }
-            }
-            case "provider-large": {
-                if (!exception.equals("null")){
-                    MyConf.largeNUM.getAndAdd(1);
-                }
-            }
-        }
+//        switch (invoker.getUrl().getHost()) {
+//            case "provider-small": {
+//                if (!exception.equals("null")){
+//                    MyConf.smallNUM.getAndAdd(1);
+//                }
+//
+//            }
+//            case "provider-medium":{
+//                if (!exception.equals("null")){
+//                    MyConf.mediumNUM.getAndAdd(1);
+//                }
+//            }
+//            case "provider-large": {
+//                if (!exception.equals("null")){
+//                    MyConf.largeNUM.getAndAdd(1);
+//                }
+//            }
+//        }
 
 
         return result;
