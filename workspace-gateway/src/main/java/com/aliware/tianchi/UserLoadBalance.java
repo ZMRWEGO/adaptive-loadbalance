@@ -49,7 +49,7 @@ public class UserLoadBalance implements LoadBalance {
 
         } else {
             //防止并发情况出现问题
-            if (isFormal.get()&&(current - MyConf.TIME.get()) / 1000 >= 1) {
+            if (isFormal.get()&&(current - MyConf.TIME.get()) / 1000 >= 6) {
                 MyConf.TIME.set(current);
 
                 getIndex();
