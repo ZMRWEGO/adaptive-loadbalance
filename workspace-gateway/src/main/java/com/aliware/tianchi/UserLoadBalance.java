@@ -33,31 +33,31 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        long current = System.currentTimeMillis();
-        weighting(current);
-        if (!isFormal.get()) {
-            if ((current - MyConf.TIME.get()) / 1000 >= 30) {
-                if (isFormal.compareAndSet(false, true)) {
-
-                    MyConf.TIME.set(current);
-                    // index.getAndAdd(1);
-                    System.out.println(stampToDate(current) + ":预热阶段结束，第一次更新最大并发数");
-                    //x = refresh(index);
-                }
-            }
-            x = randomOnWeight();
-
-        } else {
-            //防止并发情况出现问题
-            if (isFormal.get()&&(current - MyConf.TIME.get()) / 1000 >= 6) {
-                MyConf.TIME.set(current);
-
-                getIndex();
-            }
-            x = refresh();
-        }
+//        long current = System.currentTimeMillis();
+//        weighting(current);
+//        if (!isFormal.get()) {
+//            if ((current - MyConf.TIME.get()) / 1000 >= 30) {
+//                if (isFormal.compareAndSet(false, true)) {
+//
+//                    MyConf.TIME.set(current);
+//                    // index.getAndAdd(1);
+//                    System.out.println(stampToDate(current) + ":预热阶段结束，第一次更新最大并发数");
+//                    //x = refresh(index);
+//                }
+//            }
+//            x = randomOnWeight();
+//
+//        } else {
+//            //防止并发情况出现问题
+//            if (isFormal.get()&&(current - MyConf.TIME.get()) / 1000 >= 6) {
+//                MyConf.TIME.set(current);
+//
+//                getIndex();
+//            }
+//            x = refresh();
+//        }
         //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-        return invokers.get(x);
+        return invokers.get(randomOnWeight());
     }
 
     private int randomOnWeight() {
@@ -134,21 +134,21 @@ public class UserLoadBalance implements LoadBalance {
         long medium =  MyConf.mediumNUM.get();
         long large = MyConf.largeNUM.get();
         System.out.println(small+" -"+medium+"-"+large);
-        if (small > Math.max(large,medium)) {
+        if (small >= Math.max(large,medium)) {
             index.set(0);
             System.out.println("更新到small");
-        } else if (medium > Math.max(large,small)) {
+        } else if (medium >= Math.max(large,small)) {
             index.set(1);
             System.out.println("更新到medium");
-        } else if (large > Math.max(small,medium)) {
+        } else if (large >= Math.max(small,medium)) {
             index.set(2);
             System.out.println("更新到large");
         } else {
             System.out.println("未更新");
         }
-        MyConf.smallNUM.set(1);
-        MyConf.mediumNUM.set(1);
-        MyConf.largeNUM.set(1);
+        MyConf.smallNUM.getAndSet(1);
+        MyConf.mediumNUM.getAndSet(1);
+        MyConf.largeNUM.getAndSet(1);
     }
 
     public String stampToDate(long s) {
