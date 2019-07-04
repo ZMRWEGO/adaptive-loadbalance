@@ -1,10 +1,5 @@
 package com.aliware.tianchi;
 
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
@@ -21,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CallbackServiceImpl implements CallbackService {
 
+    Map<String, String> map = new ConcurrentHashMap<>();
+
     public CallbackServiceImpl() {
         timer.schedule(new TimerTask() {
             @Override
@@ -28,10 +25,13 @@ public class CallbackServiceImpl implements CallbackService {
                 if (!listeners.isEmpty()) {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
-                            //获取当前服务器活跃线程数
-                            int aliveThreads = Thread.activeCount();
-//                            entry.getValue()
-//                                .receiveServerMsg(System.getProperty("quota") + " " + "活跃线程数：" + aliveThreads);
+                            map.put("name", System.getProperty("quota"));
+                           // map.put("cost_time", MyConf.COST_TIME.toString());
+                            //map.put("active_tasks", MyConf.ACTIVE_TASKS.toString());
+                            map.put("request", MyConf.REQUEST);
+                            map.put("response", MyConf.RESPONSE);
+                            entry.getValue()
+                                .receiveServerMsg(map.toString());
                         } catch (Throwable t1) {
                             listeners.remove(entry.getKey());
                         }

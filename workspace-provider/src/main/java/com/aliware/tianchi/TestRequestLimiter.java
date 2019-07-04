@@ -20,6 +20,7 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
+        MyConf.REQUEST = request.toString();
         return true;
     }
 

@@ -17,9 +17,13 @@ import org.apache.dubbo.rpc.RpcException;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
+
+    long startTime ;
+
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            startTime = System.currentTimeMillis();
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
@@ -30,6 +34,9 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        MyConf.RESPONSE = result.toString();
+        //解析出来exception
+
         return result;
     }
 
