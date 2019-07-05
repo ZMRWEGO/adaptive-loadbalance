@@ -7,6 +7,7 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.RpcStatus;
 
 /**
  * @author daofeng.xjf
@@ -23,7 +24,7 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            startTime = System.currentTimeMillis();
+            MyConf.active.getAndIncrement();
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
@@ -34,9 +35,15 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-        MyConf.RESPONSE = result.toString();
-        //解析出来exception
 
+        if (result.getException() == null) {
+            // System.out.println(result.getException().toString());
+            MyConf.active.getAndDecrement();
+            //解析出来exception
+        } else {
+            System.out.println(result.getException().toString());
+        }
+        result.setAttachment("activeTask",String.valueOf(MyConf.active.get()));
         return result;
     }
 

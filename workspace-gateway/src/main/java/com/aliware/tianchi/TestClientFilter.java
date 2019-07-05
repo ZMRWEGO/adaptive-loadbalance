@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.util.GlobalConf;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
 import org.apache.dubbo.rpc.Filter;
@@ -35,28 +36,18 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
-        System.out.println(result.toString()+"\n"+invocation.toString()+"\n"+invoker.toString());
-        //String s = result.toString().split("=")[2];
-        //String exception = s.substring(0, s.length() - 1);
-        //System.out.println(exception);
-//        switch (invoker.getUrl().getHost()) {
-//            case "provider-small": {
-//                if (!exception.equals("null")){
-//                    MyConf.smallNUM.getAndAdd(1);
-//                }
-//
-//            }
-//            case "provider-medium":{
-//                if (!exception.equals("null")){
-//                    MyConf.mediumNUM.getAndAdd(1);
-//                }
-//            }
-//            case "provider-large": {
-//                if (!exception.equals("null")){
-//                    MyConf.largeNUM.getAndAdd(1);
-//                }
-//            }
-//        }
+
+        switch (invoker.getUrl().getHost()) {
+            case "provider-small": {
+                GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
+            }
+            case "provider-medium":{
+                GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
+            }
+            case "provider-large": {
+                GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
+            }
+        }
 
 
         return result;

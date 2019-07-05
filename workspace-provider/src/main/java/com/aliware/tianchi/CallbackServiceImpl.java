@@ -28,8 +28,6 @@ public class CallbackServiceImpl implements CallbackService {
                             map.put("name", System.getProperty("quota"));
                            // map.put("cost_time", MyConf.COST_TIME.toString());
                             //map.put("active_tasks", MyConf.ACTIVE_TASKS.toString());
-                            map.put("request", MyConf.REQUEST);
-                            map.put("response", MyConf.RESPONSE);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());
                         } catch (Throwable t1) {
