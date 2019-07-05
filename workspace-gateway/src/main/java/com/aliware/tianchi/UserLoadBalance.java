@@ -175,21 +175,21 @@ public class UserLoadBalance implements LoadBalance {
     }
     private int getActive(int i){
         if (i == 0){
-            return GlobalConf.smallActive*117;
+            return GlobalConf.smallActive*20;
         } else if (i == 1) {
-            return GlobalConf.mediumActive*52;
+            return GlobalConf.mediumActive*6;
         } else {
-            return GlobalConf.largeActive*36;
+            return GlobalConf.largeActive*5;
         }
     }
 
     private int getWeight(int i) {
         if (i == 0) {
-            return 4;
+            return 150;
         } else if (i == 1) {
-            return 9;
+            return 500;
         } else {
-            return 13;
+            return 650;
         }
     }
 }
