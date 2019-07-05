@@ -35,8 +35,9 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
-        String s = result.toString().split("=")[2];
-        String exception = s.substring(0, s.length() - 1);
+        System.out.println(result.toString()+"\n"+invocation.toString()+"\n"+invoker.toString());
+        //String s = result.toString().split("=")[2];
+        //String exception = s.substring(0, s.length() - 1);
         //System.out.println(exception);
 //        switch (invoker.getUrl().getHost()) {
 //            case "provider-small": {
