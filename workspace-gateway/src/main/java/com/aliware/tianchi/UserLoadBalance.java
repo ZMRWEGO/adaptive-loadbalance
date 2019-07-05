@@ -36,32 +36,32 @@ public class UserLoadBalance implements LoadBalance {
     private LeastActiveLoadBalance leastActiveLoadBalance;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        return leastActiveLoadBalance.select(invokers, url, invocation);
-//        long current = System.currentTimeMillis();
-//        weighting(current);
-//        if (!isFormal.get()) {
-//            if ((current - GlobalConf.TIME.get()) >= 30000) {
-//                if (isFormal.compareAndSet(false, true)) {
-//
-//                    GlobalConf.TIME.set(current);
-//                    // index.getAndAdd(1);
-//                    System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
-//                    //x = refresh(index);
-//                }
-//            }
-//           // x = randomOnWeight();
-//
-//        } else {
-//            if (isFormal.get() && (current - GlobalConf.TIME.get()) >=6000) {
-//                GlobalConf.TIME.set(current);
-//                index.getAndAdd(1);
-//                int circle = index.get() + 1;
-//                System.out.println(stampToDate(current)+":第" + circle + "次,consumer线程数"+Thread.activeCount());
-//            }
-//           // x = refresh(index);
-//        }
-//        //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
-//        return invokers.get(randomOnWeight());
+       // return leastActiveLoadBalance.select(invokers, url, invocation);
+        long current = System.currentTimeMillis();
+        weighting(current);
+        if (!isFormal.get()) {
+            if ((current - GlobalConf.TIME.get()) >= 30000) {
+                if (isFormal.compareAndSet(false, true)) {
+
+                    GlobalConf.TIME.set(current);
+                    // index.getAndAdd(1);
+                    System.out.println(stampToDate(current)+":预热阶段结束，第一次更新最大并发数");
+                    //x = refresh(index);
+                }
+            }
+           // x = randomOnWeight();
+
+        } else {
+            if (isFormal.get() && (current - GlobalConf.TIME.get()) >=6000) {
+                GlobalConf.TIME.set(current);
+                index.getAndAdd(1);
+                int circle = index.get() + 1;
+                System.out.println(stampToDate(current)+":第" + circle + "次,consumer线程数"+Thread.activeCount());
+            }
+           // x = refresh(index);
+        }
+        //System.out.println("ZCL-DEBUG:" + x + isFormal.get());
+        return invokers.get(randomOnWeight());
     }
 
     private int randomOnWeight() {
