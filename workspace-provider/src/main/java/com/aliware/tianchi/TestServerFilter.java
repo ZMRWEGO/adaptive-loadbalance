@@ -41,7 +41,7 @@ public class TestServerFilter implements Filter {
             MyConf.active.getAndDecrement();
             //解析出来exception
         } else {
-            System.out.println(result.getException().toString());
+            System.out.println("服务端异常："+result.getException().toString());
         }
         result.setAttachment("activeTask",String.valueOf(MyConf.active.get()));
         return result;

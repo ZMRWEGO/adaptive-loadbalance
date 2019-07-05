@@ -38,7 +38,7 @@ public class UserLoadBalance implements LoadBalance {
     private LeastActiveLoadBalance leastActiveLoadBalance;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        System.out.println("s:"+GlobalConf.smallActive+"m"+GlobalConf.mediumActive+"l"+GlobalConf.largeActive);
+        System.out.println("s:"+GlobalConf.smallActive+"m："+GlobalConf.mediumActive+"l："+GlobalConf.largeActive);
         int length = invokers.size();
         // 最小的活跃数
         int leastActive = -1;
@@ -175,21 +175,21 @@ public class UserLoadBalance implements LoadBalance {
     }
     private int getActive(int i){
         if (i == 0){
-            return GlobalConf.smallActive*20;
+            return GlobalConf.smallActive*117;
         } else if (i == 1) {
-            return GlobalConf.mediumActive*6;
+            return GlobalConf.mediumActive*52;
         } else {
-            return GlobalConf.largeActive*5;
+            return GlobalConf.largeActive*36;
         }
     }
 
     private int getWeight(int i) {
         if (i == 0) {
-            return 150;
+            return 4;
         } else if (i == 1) {
-            return 500;
+            return 9;
         } else {
-            return 650;
+            return 13;
         }
     }
 }

@@ -36,17 +36,13 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
-
-        switch (invoker.getUrl().getHost()) {
-            case "provider-small": {
-                GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
-            }
-            case "provider-medium":{
-                GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
-            }
-            case "provider-large": {
-                GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
-            }
+        String host = invoker.getUrl().getHost();
+        if (host.equals("provider-small")) {
+            GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
+        } else if (host.equals("provider-medium")) {
+            GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
+        } else {
+            GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
         }
 
 
