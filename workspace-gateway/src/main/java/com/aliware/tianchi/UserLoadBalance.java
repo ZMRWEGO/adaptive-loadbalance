@@ -72,12 +72,12 @@ public class UserLoadBalance implements LoadBalance {
         }
     }
     private int randomOnWeight() {
-        int[] weightArray = new int[]{150, 500, 650};
+        int[] weightArray = new int[]{30, 85, 115};
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         Map<Integer, Integer> map = new HashMap<>();
-        map.put(150, 0);
-        map.put(500, 1);
-        map.put(650, 2);
+        map.put(30, 0);
+        map.put(85, 1);
+        map.put(115, 2);
         int key = 0;
         for (int weight : weightArray) {
             treeMap.put(key, weight);
