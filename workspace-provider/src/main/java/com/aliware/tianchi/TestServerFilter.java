@@ -18,13 +18,9 @@ import org.apache.dubbo.rpc.RpcStatus;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
-
-    long startTime ;
-
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            MyConf.active.getAndIncrement();
             Result result = invoker.invoke(invocation);
             return result;
         }catch (Exception e){
@@ -35,14 +31,7 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
-
-        if (result.getException() == null) {
-            // System.out.println(result.getException().toString());
-            MyConf.active.getAndDecrement();
-            //解析出来exception
-        } else {
-            System.out.println("服务端异常："+result.getException().toString());
-        }
+        MyConf.active.decrementAndGet();
         result.setAttachment("activeTask",String.valueOf(MyConf.active.get()));
         return result;
     }

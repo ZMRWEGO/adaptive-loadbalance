@@ -38,8 +38,8 @@ public class UserLoadBalance implements LoadBalance {
     private LeastActiveLoadBalance leastActiveLoadBalance;
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        System.out.println("s:"+GlobalConf.smallActive+"m："+GlobalConf.mediumActive+"l："+GlobalConf.largeActive);
-        int length = invokers.size();
+        //System.out.println("s:"+GlobalConf.smallActive+"m："+GlobalConf.mediumActive+"l："+GlobalConf.largeActive);
+        int length = 3;
         // 最小的活跃数
         int leastActive = -1;
         // 具有相同“最小活跃数”的服务者提供者（以下用 Invoker 代称）数量
@@ -54,7 +54,6 @@ public class UserLoadBalance implements LoadBalance {
 
         // 遍历 invokers 列表
         for (int i = 0; i < length; i++) {
-            Invoker<T> invoker = invokers.get(i);
             // 获取 Invoker 对应的活跃数
             int active = getActive(i);
             // 获取权重 - ⭐️
@@ -109,63 +108,6 @@ public class UserLoadBalance implements LoadBalance {
         return invokers.get(leastIndexs[random.nextInt(leastCount)]);
     }
 
-
-    private int randomOnWeight() {
-        int[] weightArray = new int[]{150, 500, 650};
-        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(150, 0);
-        map.put(500, 1);
-        map.put(650, 2);
-        int key = 0;
-        for (int weight : weightArray) {
-            treeMap.put(key, weight);
-            key += weight;
-        }
-
-        Random r = new Random();
-        int num;
-        num = r.nextInt(key);
-        return map.get(treeMap.floorEntry(num).getValue());
-
-    }
-
-    private void weighting(long current) {
-        //System.out.println(Thread.currentThread().getId());
-        if (!init.get()) {
-            if (init.compareAndSet(false, true)) {
-                GlobalConf.TIME = new AtomicLong(System.currentTimeMillis());
-            }
-        }
-
-    }
-
-    private int refresh(AtomicInteger index) {
-        if (index.get() > 9) {
-            index.set(9);
-        }
-        int small = Double.valueOf(GlobalConf.smallMC[index.get()]/GlobalConf.smallRT[index.get()]*1000).intValue();
-        int medium = Double.valueOf(GlobalConf.mediumMC[index.get()]/GlobalConf.mediumRT[index.get()]*1000).intValue();
-        int large = Double.valueOf(GlobalConf.largeMC[index.get()]/GlobalConf.largeRT[index.get()]*1000).intValue();
-        int[] weightArray = {small, medium, large};
-        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(small, 0);
-        map.put(medium, 1);
-        map.put(large, 2);
-        int key = 0;
-        for (int weight : weightArray) {
-            treeMap.put(key, weight);
-            key += weight;
-        }
-
-        Random r = new Random();
-        int num;
-        num = r.nextInt(key);
-        int result = map.get(treeMap.floorEntry(num).getValue());
-        System.out.println("s:" + small + " m:" + medium + " l" + large + "weight" + result);
-        return result;
-    }
     public  String stampToDate(long s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -174,22 +116,22 @@ public class UserLoadBalance implements LoadBalance {
         return res;
     }
     private int getActive(int i){
-        if (i == 0){
-            return GlobalConf.smallActive*20;
+        if (i == 2){
+            return GlobalConf.largeActive;
         } else if (i == 1) {
-            return GlobalConf.mediumActive*6;
+            return GlobalConf.mediumActive;
         } else {
-            return GlobalConf.largeActive*5;
+            return GlobalConf.smallActive;
         }
     }
 
     private int getWeight(int i) {
-        if (i == 0) {
-            return 150;
+        if (i == 2) {
+            return 13;
         } else if (i == 1) {
-            return 500;
+            return 9;
         } else {
-            return 650;
+            return 4;
         }
     }
 }
