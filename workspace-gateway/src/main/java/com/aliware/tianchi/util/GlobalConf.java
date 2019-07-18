@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2019/7/1 11:15
  */
 public class GlobalConf {
-    public static int smallActive = 0;
-    public static int mediumActive = 0;
-    public static int largeActive = 0;
+    public static volatile int smallActive = 0;
+    public static volatile int mediumActive = 0;
+    public static volatile int largeActive = 0;
 }
