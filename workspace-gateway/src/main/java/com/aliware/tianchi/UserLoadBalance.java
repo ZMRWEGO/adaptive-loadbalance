@@ -59,7 +59,7 @@ public class UserLoadBalance implements LoadBalance {
             // 获取权重 - ⭐️
             int weight = getWeight(i);
             // 发现最大任务数
-            if (leastComplete == -1 || active > leastComplete) {
+            if (active > leastComplete) {
                 // 使用最大任务数
                 leastComplete = active;
                 // 更新 leastCount 为 1
@@ -107,30 +107,6 @@ public class UserLoadBalance implements LoadBalance {
         // 如果权重相同或权重为0时，随机返回一个 Invoker
         return invokers.get(leastIndexs[random.nextInt(leastCount)]);
     }
-
-
-    private int randomOnWeight() {
-        int[] weightArray = new int[]{150, 500, 650};
-        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(150, 0);
-        map.put(500, 1);
-        map.put(650, 2);
-        int key = 0;
-        for (int weight : weightArray) {
-            treeMap.put(key, weight);
-            key += weight;
-        }
-
-        Random r = new Random();
-        int num;
-        num = r.nextInt(key);
-        return map.get(treeMap.floorEntry(num).getValue());
-
-    }
-
-
-
     public  String stampToDate(long s){
         String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
