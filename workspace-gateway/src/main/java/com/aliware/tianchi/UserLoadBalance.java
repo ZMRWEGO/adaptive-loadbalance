@@ -21,6 +21,7 @@ public class UserLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
+        System.out.println("small:"+GlobalConf.smallActive+"medium:"+GlobalConf.mediumActive+"large:"+GlobalConf.largeActive);
         int length = invokers.size();
         // 最小的活跃数
         long leastActive = -1;
