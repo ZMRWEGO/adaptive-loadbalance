@@ -99,11 +99,11 @@ public class UserLoadBalance implements LoadBalance {
 
     private long getActive(int i){
         if (i == 0){
-            return GlobalConf.smallActive*10000/ GlobalConf.smallBefore;
+            return GlobalConf.smallActive * 10000 / (GlobalConf.smallBefore + 1);
         } else if (i == 1) {
-            return GlobalConf.mediumActive*10000/ GlobalConf.mediumBefore;
+            return GlobalConf.mediumActive * 10000 / (GlobalConf.mediumBefore + 1);
         } else {
-            return GlobalConf.largeActive*10000/ GlobalConf.largeBefore;
+            return GlobalConf.largeActive * 10000 / (GlobalConf.largeBefore + 1);
         }
     }
 
