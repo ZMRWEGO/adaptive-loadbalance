@@ -12,16 +12,19 @@ import org.apache.dubbo.rpc.RpcException;
 /**
  * @author daofeng.xjf
  *
- * 客户端过滤器 可选接口 用户可以在客户端拦截请求和响应,捕获 rpc 调用时产生、服务端返回的已知异常。
+ * 客户端过滤器
+ * 可选接口
+ * 用户可以在客户端拦截请求和响应,捕获 rpc 调用时产生、服务端返回的已知异常。
  */
 @Activate(group = Constants.CONSUMER)
 public class TestClientFilter implements Filter {
+
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        try {
+        try{
             Result result = invoker.invoke(invocation);
             return result;
-        } catch (Exception e) {
+        }catch (Exception e){
             throw e;
         }
 
@@ -32,13 +35,14 @@ public class TestClientFilter implements Filter {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
         String host = invoker.getUrl().getHost();
-        if (host.equals("provider-large")) {
-            GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask")) / 13;
+        if (host.equals("provider-small")) {
+            GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
         } else if (host.equals("provider-medium")) {
-            GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask")) / 9;
+            GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
         } else {
-            GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask")) / 4;
+            GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
         }
+
 
         return result;
     }

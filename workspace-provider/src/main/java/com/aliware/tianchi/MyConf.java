@@ -13,7 +13,6 @@ public class MyConf {
     public static LinkedList<Integer> queue = new LinkedList<>();
 
     public static AtomicInteger active=new AtomicInteger(0);
-    public static String RESPONSE;
-    public static String REQUEST;
+
 
 }

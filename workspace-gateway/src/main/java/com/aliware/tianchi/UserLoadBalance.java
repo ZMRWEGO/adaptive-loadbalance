@@ -1,28 +1,13 @@
 package com.aliware.tianchi;
 
 import com.aliware.tianchi.util.GlobalConf;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
-import java.util.TreeMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import org.apache.dubbo.common.URL;
-import org.apache.dubbo.common.utils.NamedThreadFactory;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
-import org.apache.dubbo.rpc.RpcStatus;
 import org.apache.dubbo.rpc.cluster.LoadBalance;
-import java.util.List;
-import org.apache.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
 
 /**
  * @author daofeng.xjf
@@ -31,17 +16,14 @@ import org.apache.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
  */
 public class UserLoadBalance implements LoadBalance {
 
-    private final AtomicBoolean init = new AtomicBoolean(false);
-    private final AtomicBoolean isFormal = new AtomicBoolean(false);
+
     private final Random random = new Random();
-    private int x = 2;
-    private LeastActiveLoadBalance leastActiveLoadBalance;
+
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        //System.out.println("s:"+GlobalConf.smallActive+"m："+GlobalConf.mediumActive+"l："+GlobalConf.largeActive);
         int length = invokers.size();
         // 最小的活跃数
-        int leastComplete = -1;
+        long leastActive = -1;
         // 具有相同“最小活跃数”的服务者提供者（以下用 Invoker 代称）数量
         int leastCount = 0;
         // leastIndexs 用于记录具有相同“最小活跃数”的 Invoker 在 invokers 列表中的下标信息
@@ -55,13 +37,13 @@ public class UserLoadBalance implements LoadBalance {
         // 遍历 invokers 列表
         for (int i = 0; i < length; i++) {
             // 获取 Invoker 对应的活跃数
-            int active = getActive(i);
+            long active = getActive(i);
             // 获取权重 - ⭐️
             int weight = getWeight(i);
-            // 发现最大任务数
-            if (active > leastComplete) {
-                // 使用最大任务数
-                leastComplete = active;
+            // 发现更小的活跃数，重新开始
+            if (leastActive == -1 || active < leastActive) {
+                // 使用当前活跃数 active 更新最小活跃数 leastActive
+                leastActive = active;
                 // 更新 leastCount 为 1
                 leastCount = 1;
                 // 记录当前下标值到 leastIndexs 中
@@ -71,7 +53,7 @@ public class UserLoadBalance implements LoadBalance {
                 sameWeight = true;
 
                 // 当前 Invoker 的活跃数 active 与最小活跃数 leastActive 相同
-            } else if (active == leastComplete) {
+            } else if (active == leastActive) {
                 // 在 leastIndexs 中记录下当前 Invoker 在 invokers 集合中的下标
                 leastIndexs[leastCount++] = i;
                 // 累加权重
@@ -84,7 +66,10 @@ public class UserLoadBalance implements LoadBalance {
                 }
             }
         }
-
+        //更新上个节点
+        GlobalConf.smallBefore = GlobalConf.smallActive;
+        GlobalConf.mediumBefore = GlobalConf.mediumActive;
+        GlobalConf.largeBefore = GlobalConf.largeActive;
         // 当只有一个 Invoker 具有最小活跃数，此时直接返回该 Invoker 即可
         if (leastCount == 1) {
             return invokers.get(leastIndexs[0]);
@@ -104,33 +89,31 @@ public class UserLoadBalance implements LoadBalance {
                     return invokers.get(leastIndex);
             }
         }
+
         // 如果权重相同或权重为0时，随机返回一个 Invoker
         return invokers.get(leastIndexs[random.nextInt(leastCount)]);
     }
-    public  String stampToDate(long s){
-        String res;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date(s);
-        res = simpleDateFormat.format(date);
-        return res;
-    }
-    private int getActive(int i){
+
+
+
+
+    private long getActive(int i){
         if (i == 0){
-            return GlobalConf.smallActive;
+            return GlobalConf.smallActive*10000/ GlobalConf.smallBefore;
         } else if (i == 1) {
-            return GlobalConf.mediumActive;
+            return GlobalConf.mediumActive*10000/ GlobalConf.mediumBefore;
         } else {
-            return GlobalConf.largeActive;
+            return GlobalConf.largeActive*10000/ GlobalConf.largeBefore;
         }
     }
 
     private int getWeight(int i) {
         if (i == 0) {
-            return 4;
+            return 150;
         } else if (i == 1) {
-            return 9;
+            return 500;
         } else {
-            return 13;
+            return 650;
         }
     }
 }
