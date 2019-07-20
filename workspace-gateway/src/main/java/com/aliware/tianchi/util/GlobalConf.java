@@ -11,6 +11,9 @@ public class GlobalConf {
     public static volatile int smallActive;
     public static volatile int mediumActive;
     public static volatile int largeActive;
+    public static volatile int smallRtt;
+    public static volatile int mediumRtt;
+    public static volatile int largeRtt;
     public static int smallMax;
     public static int mediumMax;
     public static int largeMax;

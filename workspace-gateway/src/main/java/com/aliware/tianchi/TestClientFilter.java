@@ -37,10 +37,14 @@ public class TestClientFilter implements Filter {
         String host = invoker.getUrl().getHost();
         if (host.equals("provider-small")) {
             GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
+            GlobalConf.smallRtt = Integer.valueOf(result.getAttachment("rtt"));
         } else if (host.equals("provider-medium")) {
             GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
+            GlobalConf.mediumRtt = Integer.valueOf(result.getAttachment("rtt"));
+
         } else {
             GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
+            GlobalConf.largeRtt = Integer.valueOf(result.getAttachment("rtt"));
         }
 
 

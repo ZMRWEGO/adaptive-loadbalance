@@ -26,8 +26,10 @@ public class TestServerFilter implements Filter {
         try {
             long start = System.currentTimeMillis();
             Result result = invoker.invoke(invocation);
-            logger.info("rtt:" + (System.currentTimeMillis() - start));
+            long rtt = (System.currentTimeMillis() - start);
+            logger.info("rtt:" +rtt);
             result.setAttachment("activeTask", String.valueOf(MyConf.active));
+            result.setAttachment("rtt",String.valueOf(rtt));
             return result;
         } catch (Exception e) {
             throw e;
