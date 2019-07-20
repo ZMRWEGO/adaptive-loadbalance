@@ -31,7 +31,7 @@ public class UserLoadBalance implements LoadBalance {
         if (GlobalConf.smallMax != 0 && GlobalConf.mediumMax != 0 && GlobalConf.largeMax != 0) {
             int length = 3;
             // 剩余活跃数
-            int leastRtt = -1;
+            int leastRtt = Integer.MAX_VALUE;
             // 相同剩余活跃 数量
             int count = 0;
             // indexes 用于记录具有相同“活跃数”的 Invoker 在 invokers 列表中的下标信息
@@ -44,40 +44,36 @@ public class UserLoadBalance implements LoadBalance {
 
             // 遍历 invokers 列表
             for (int i = 0; i < length; i++) {
-                if (getActive(i) != 0) {
-                    // 获取 Invoker 对应的活跃数
-                    int rtt = getRtt(i);
-                    // 获取权重 - ⭐️
-                    int weight = getWeight(i);
-                    // 发现更大的活跃数，重新开始
-                    if (rtt < leastRtt||leastRtt == -1) {
-                        // 使用当前活跃数 rtt 更新最大活跃数 remainActive
-                        leastRtt = rtt;
-                        // 更新 count 为 1
-                        count = 1;
-                        // 记录当前下标值到 indexes 中
-                        indexes[0] = i;
-                        totalWeight = weight;
-                        firstWeight = weight;
-                        sameWeight = true;
-                    } else if (rtt == leastRtt) {
-                        // 在 indexes 中记录下当前 Invoker 在 invokers 集合中的下标
-                        indexes[count++] = i;
-                        // 累加权重
-                        totalWeight += weight;
-                        // 检测当前 Invoker 的权重与 firstWeight 是否相等，
-                        // 不相等则将 sameWeight 置为 false
-                        if (sameWeight && i > 0
-                            && weight != firstWeight) {
-                            sameWeight = false;
-                        }
+                // 获取 Invoker 对应的活跃数
+                int rtt = getActive(i);
+                // 获取权重 - ⭐️
+                int weight = getWeight(i);
+                // 发现更大的活跃数，重新开始
+                if (rtt > leastRtt || leastRtt == Integer.MAX_VALUE) {
+                    // 使用当前活跃数 rtt 更新最大活跃数 remainActive
+                    leastRtt = rtt;
+                    // 更新 count 为 1
+                    count = 1;
+                    // 记录当前下标值到 indexes 中
+                    indexes[0] = i;
+                    totalWeight = weight;
+                    firstWeight = weight;
+                    sameWeight = true;
+                } else if (rtt == leastRtt) {
+                    // 在 indexes 中记录下当前 Invoker 在 invokers 集合中的下标
+                    indexes[count++] = i;
+                    // 累加权重
+                    totalWeight += weight;
+                    // 检测当前 Invoker 的权重与 firstWeight 是否相等，
+                    // 不相等则将 sameWeight 置为 false
+                    if (sameWeight && i > 0
+                        && weight != firstWeight) {
+                        sameWeight = false;
                     }
                 }
             }
             if (count == 1) {
                 return invokers.get(indexes[0]);
-            } else if (count == 0) {
-                return invokers.get(randomOnWeight());
             }
 
             // 有多个 Invoker 具有相同的最大活跃数，但它们之间的权重不同
@@ -125,11 +121,11 @@ public class UserLoadBalance implements LoadBalance {
 
     private int getActive(int i) {
         if (i == 0) {
-            return GlobalConf.smallMax - GlobalConf.smallActive;
+            return (GlobalConf.smallMax - GlobalConf.smallActive)*10000 / getRtt(i);
         } else if (i == 1) {
-            return GlobalConf.mediumMax - GlobalConf.mediumActive;
+            return (GlobalConf.mediumMax - GlobalConf.mediumActive)*10000 / getRtt(i);
         } else {
-            return GlobalConf.largeMax - GlobalConf.largeActive;
+            return (GlobalConf.largeMax - GlobalConf.largeActive)*10000 / getRtt(i);
         }
     }
 
