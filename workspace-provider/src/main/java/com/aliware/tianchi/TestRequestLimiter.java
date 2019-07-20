@@ -23,8 +23,11 @@ public class TestRequestLimiter implements RequestLimiter {
     public boolean tryAcquire(Request request, int activeTaskCount) {
         MyConf.active = activeTaskCount;
         //logger.info("activeTaskCount:"+activeTaskCount);
-
-        return activeTaskCount==0?false:true;
+        if (MyConf.max != 0) {
+            return (MyConf.max - activeTaskCount) == 0 ? false : true;
+        } else {
+            return true;
+        }
     }
 
 }

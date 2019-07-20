@@ -12,6 +12,6 @@ public class MyConf {
 
 
     public static volatile int active;
-
+    public static long max;
 
 }

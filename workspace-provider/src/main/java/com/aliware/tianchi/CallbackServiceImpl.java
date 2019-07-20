@@ -42,6 +42,7 @@ public class CallbackServiceImpl implements CallbackService {
                                     //线程池
                                 }
                             }
+                            MyConf.max = maximumPoolSize;
                             map.put(name, maximumPoolSize);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());
