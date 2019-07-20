@@ -29,7 +29,7 @@ public class UserLoadBalance implements LoadBalance {
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         //比较剩余可用线程数，
         if (GlobalConf.smallMax != 0 && GlobalConf.mediumMax != 0 && GlobalConf.largeMax != 0) {
-            int length = invokers.size();
+            int length = 3;
             // 剩余活跃数
             int remainActive = -1;
             // 相同剩余活跃 数量

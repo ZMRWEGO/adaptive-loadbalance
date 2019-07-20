@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MyConf {
 
-    public static LinkedList<Integer> queue = new LinkedList<>();
 
     public static volatile int active;
 

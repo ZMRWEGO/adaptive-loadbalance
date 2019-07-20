@@ -18,7 +18,7 @@ public class CallbackListenerImpl implements CallbackListener {
         String[] map = msg.substring(1, msg.length() - 1).split("=");
         String name = map[0];
         String max = map[1];
-        logger.info("map:"+msg);
+        //logger.info("map:"+msg);
         if (name.equals("large")) {
             GlobalConf.largeMax = Integer.valueOf(max);
         } else if (name.equals("medium")) {

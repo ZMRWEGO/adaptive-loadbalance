@@ -8,9 +8,9 @@ package com.aliware.tianchi.util;
 public class GlobalConf {
 
 
-    public static int smallActive;
-    public static int mediumActive;
-    public static int largeActive;
+    public static volatile int smallActive;
+    public static volatile int mediumActive;
+    public static volatile int largeActive;
     public static int smallMax;
     public static int mediumMax;
     public static int largeMax;

@@ -22,8 +22,9 @@ public class TestRequestLimiter implements RequestLimiter {
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
         MyConf.active = activeTaskCount;
-        logger.info("activeTaskCount:"+activeTaskCount);
-        return true;
+        //logger.info("activeTaskCount:"+activeTaskCount);
+
+        return activeTaskCount==0?false:true;
     }
 
 }
