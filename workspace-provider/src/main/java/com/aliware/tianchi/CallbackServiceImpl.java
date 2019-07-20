@@ -5,6 +5,11 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.extension.ExtensionLoader;
+import org.apache.dubbo.common.store.DataStore;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
@@ -15,7 +20,8 @@ import org.apache.dubbo.rpc.service.CallbackService;
  */
 public class CallbackServiceImpl implements CallbackService {
 
-    Map<String, String> map = new ConcurrentHashMap<>();
+    Map<String, Long> map = new ConcurrentHashMap<>();
+    static volatile long maximumPoolSize;
 
     public CallbackServiceImpl() {
         timer.schedule(new TimerTask() {
@@ -24,9 +30,19 @@ public class CallbackServiceImpl implements CallbackService {
                 if (!listeners.isEmpty()) {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
-                            map.put("name", System.getProperty("quota"));
-                           // map.put("cost_time", MyConf.COST_TIME.toString());
-                            //map.put("active_tasks", MyConf.ACTIVE_TASKS.toString());
+                            String name = System.getProperty("quota");
+                            //通过spi获取最大线程数
+                            DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
+                            Map<String, Object> executors = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
+                            for (Map.Entry<String, Object> map : executors.entrySet()) {
+                                ExecutorService executor = (ExecutorService) map.getValue();
+                                if (executor instanceof ThreadPoolExecutor) {
+                                    ThreadPoolExecutor tp = (ThreadPoolExecutor) executor;
+                                    maximumPoolSize = tp.getMaximumPoolSize();
+                                    //线程池
+                                }
+                            }
+                            map.put(name, maximumPoolSize);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());
                         } catch (Throwable t1) {
