@@ -24,7 +24,9 @@ public class TestRequestLimiter implements RequestLimiter {
         MyConf.active = activeTaskCount;
         //logger.info("activeTaskCount:"+activeTaskCount);
         if (MyConf.max != 0) {
-            return (MyConf.max - activeTaskCount) == 0 ? false : true;
+            long temp = MyConf.max - activeTaskCount;
+            logger.info("remain tasks:"+temp);
+            return temp == 0 ? false : true;
         } else {
             return true;
         }
