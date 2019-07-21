@@ -31,18 +31,6 @@ public class CallbackServiceImpl implements CallbackService {
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
                             String name = System.getProperty("quota");
-                            //通过spi获取最大线程数
-                            DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
-                            Map<String, Object> executors = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
-                            for (Map.Entry<String, Object> map : executors.entrySet()) {
-                                ExecutorService executor = (ExecutorService) map.getValue();
-                                if (executor instanceof ThreadPoolExecutor) {
-                                    ThreadPoolExecutor tp = (ThreadPoolExecutor) executor;
-                                    maximumPoolSize = tp.getMaximumPoolSize();
-                                    //线程池
-                                }
-                            }
-                            MyConf.max = maximumPoolSize;
                             map.put(name, maximumPoolSize);
                             entry.getValue()
                                 .receiveServerMsg(map.toString());

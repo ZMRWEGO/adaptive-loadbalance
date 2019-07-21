@@ -22,8 +22,7 @@ public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            int host = invoker.getUrl().getPort();
-            addActive(host);
+
             Result result = invoker.invoke(invocation);
 
 //       consumer端为异步调用 provider端为同步调用
@@ -38,36 +37,14 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
-       int host = invoker.getUrl().getPort();
-        mineActive(host);
+       int port = invoker.getUrl().getPort();
+        if (port == 20890) {
+            GlobalConf.large = Integer.valueOf(result.getAttachment("useful"));
+        } else if (port == 20870) {
+            GlobalConf.medium = Integer.valueOf(result.getAttachment("useful"));
+        } else {
+            GlobalConf.small = Integer.valueOf(result.getAttachment("useful"));
+        }
         return result;
-    }
-
-    private void addActive(int host) {
-        if (host==20890) {
-            GlobalConf.largeActive++;
-
-        } else if (host==20870) {
-            GlobalConf.mediumActive++;
-
-
-        } else {
-            GlobalConf.smallActive++;
-
-        }
-    }
-
-    private void mineActive(int host) {
-        if (host==20890) {
-
-            GlobalConf.largeActive--;
-        } else if (host==20870) {
-
-            GlobalConf.mediumActive--;
-
-        } else {
-
-            GlobalConf.smallActive--;
-        }
     }
 }

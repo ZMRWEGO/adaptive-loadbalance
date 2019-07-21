@@ -1,9 +1,17 @@
 package com.aliware.tianchi;
 
+import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
+import org.apache.dubbo.common.store.DataStore;
 import org.apache.dubbo.remoting.exchange.Request;
 import org.apache.dubbo.remoting.transport.RequestLimiter;
+
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author daofeng.xjf
@@ -13,7 +21,7 @@ import org.apache.dubbo.remoting.transport.RequestLimiter;
 public class TestRequestLimiter implements RequestLimiter {
 
     private static final Logger logger = LoggerFactory.getLogger(TestRequestLimiter.class);
-
+    private AtomicBoolean init = new AtomicBoolean(false);
     /**
      * @param request 服务请求
      * @param activeTaskCount 服务端对应线程池的活跃线程数
@@ -21,7 +29,36 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
+        //第一次获取最大线程数
+        isInit();
+        try {
+            if(MyConf.active.getAndSet(activeTaskCount)==MyConf.max){
+                Thread.sleep(10);
+            }
+        }catch (Exception e)
+        {
+            logger.error(e);
+        }
         return true;
     }
 
+
+    public void isInit() {
+        if (!init.get()) {
+            if (init.compareAndSet(false, true)) {
+                //获取最大线程数配置
+                //通过spi获取最大线程数
+                DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
+                Map<String, Object> executors = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
+                for (Map.Entry<String, Object> map : executors.entrySet()) {
+                    ExecutorService executor = (ExecutorService) map.getValue();
+                    if (executor instanceof ThreadPoolExecutor) {
+                        ThreadPoolExecutor tp = (ThreadPoolExecutor) executor;
+                        MyConf.max = tp.getMaximumPoolSize();
+                        //线程池
+                    }
+                }
+            }
+        }
+    }
 }

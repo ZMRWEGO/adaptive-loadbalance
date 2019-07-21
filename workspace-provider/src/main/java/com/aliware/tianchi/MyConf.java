@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyConf {
 
 
-    public static  int active;
+    public static  AtomicInteger active = new AtomicInteger(0);
     public static long max;
 
 }

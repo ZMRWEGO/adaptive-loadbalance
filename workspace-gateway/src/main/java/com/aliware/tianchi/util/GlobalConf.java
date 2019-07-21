@@ -9,12 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019/7/1 11:15
  */
 public class GlobalConf {
-
-
-    public static int smallActive ;
-    public static int  mediumActive;
-    public static int largeActive ;
-    public static int smallMax;
-    public static int mediumMax;
-    public static int largeMax;
+    public static volatile int small;
+    public static volatile int large;
+    public static volatile int medium;
 }
