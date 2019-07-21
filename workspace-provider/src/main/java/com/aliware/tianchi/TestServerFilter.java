@@ -30,8 +30,8 @@ public class TestServerFilter implements Filter {
             long rtt = (System.currentTimeMillis() - start);
             //     可用线程数/上一次rtt
             long remain = MyConf.max - MyConf.active.decrementAndGet();
-            if (remain < 0.75 * MyConf.max) {
-                 useful = remain * 100 / rtt;
+            if (remain < 0.8 * MyConf.max) {
+                 useful = remain * 550 / rtt;
             } else {
                 useful = remain;
             }
