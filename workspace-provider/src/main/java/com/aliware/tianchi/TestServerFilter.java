@@ -20,7 +20,7 @@ public class TestServerFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(TestServerFilter.class);
 
-
+    long useful = 0;
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try {
@@ -29,7 +29,12 @@ public class TestServerFilter implements Filter {
             Result result = invoker.invoke(invocation);
             long rtt = (System.currentTimeMillis() - start);
             //     可用线程数/上一次rtt
-            long useful = (MyConf.max - MyConf.active.decrementAndGet()) * 100 / rtt;
+            long remain = MyConf.max - MyConf.active.decrementAndGet();
+            if (remain < 0.75 * MyConf.max) {
+                 useful = remain * 100 / rtt;
+            } else {
+                useful = remain;
+            }
 //            logger.info("rtt:" +rtt);
 //            MyConf.active--;
             result.setAttachment("useful", String.valueOf(useful));
