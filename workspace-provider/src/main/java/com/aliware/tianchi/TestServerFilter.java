@@ -24,20 +24,17 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try {
-            //long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
             //这里是同步调用
             Result result = invoker.invoke(invocation);
-            //long rtt = (System.currentTimeMillis() - start);
+            long rtt = (System.currentTimeMillis() - start);
             //     可用线程数/上一次rtt
             long remain = MyConf.max - MyConf.active.decrementAndGet();
-            useful = remain;
-            /*
-            if (remain < 0.8 * MyConf.max) {
-                 useful = remain * 550 / rtt;
+            if (remain < 0.75 * MyConf.max) {
+                 useful = remain * 60 / rtt;
             } else {
                 useful = remain;
-            }
-            */
+            }           
 //            logger.info("rtt:" +rtt);
 //            MyConf.active--;
             result.setAttachment("useful", String.valueOf(useful));
