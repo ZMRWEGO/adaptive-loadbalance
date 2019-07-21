@@ -21,15 +21,7 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
-        MyConf.active = activeTaskCount;
-        //logger.info("activeTaskCount:"+activeTaskCount);
-        if (MyConf.max != 0) {
-            long temp = MyConf.max - activeTaskCount;
-            logger.info("remain tasks:"+temp);
-            return temp == 0 ? false : true;
-        } else {
-            return true;
-        }
+        return true;
     }
 
 }

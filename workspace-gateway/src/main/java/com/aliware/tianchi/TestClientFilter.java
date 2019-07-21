@@ -22,7 +22,11 @@ public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
+            int host = invoker.getUrl().getPort();
+            addActive(host);
             Result result = invoker.invoke(invocation);
+
+//       consumer端为异步调用 provider端为同步调用
             return result;
         }catch (Exception e){
             throw e;
@@ -34,20 +38,36 @@ public class TestClientFilter implements Filter {
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
         //解析Result  RpcResult [result=-870665090, exception=null]
         //解析Result  RpcResult [result=-870665090, exception=null]
-        String host = invoker.getUrl().getHost();
-        if (host.equals("provider-small")) {
-            GlobalConf.smallActive = Integer.valueOf(result.getAttachment("activeTask"));
-            GlobalConf.smallRtt = Integer.valueOf(result.getAttachment("rtt"));
-        } else if (host.equals("provider-medium")) {
-            GlobalConf.mediumActive = Integer.valueOf(result.getAttachment("activeTask"));
-            GlobalConf.mediumRtt = Integer.valueOf(result.getAttachment("rtt"));
+       int host = invoker.getUrl().getPort();
+        mineActive(host);
+        return result;
+    }
+
+    private void addActive(int host) {
+        if (host==20890) {
+            GlobalConf.largeActive++;
+
+        } else if (host==20870) {
+            GlobalConf.mediumActive++;
+
 
         } else {
-            GlobalConf.largeActive = Integer.valueOf(result.getAttachment("activeTask"));
-            GlobalConf.largeRtt = Integer.valueOf(result.getAttachment("rtt"));
+            GlobalConf.smallActive++;
+
         }
+    }
 
+    private void mineActive(int host) {
+        if (host==20890) {
 
-        return result;
+            GlobalConf.largeActive--;
+        } else if (host==20870) {
+
+            GlobalConf.mediumActive--;
+
+        } else {
+
+            GlobalConf.smallActive--;
+        }
     }
 }

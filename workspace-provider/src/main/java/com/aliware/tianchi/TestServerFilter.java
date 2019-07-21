@@ -24,12 +24,12 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try {
-            long start = System.currentTimeMillis();
+//            long start = System.currentTimeMillis();
             Result result = invoker.invoke(invocation);
-            long rtt = (System.currentTimeMillis() - start);
-            logger.info("rtt:" +rtt);
-            result.setAttachment("activeTask", String.valueOf(MyConf.active));
-            result.setAttachment("rtt",String.valueOf(rtt));
+//            long rtt = (System.currentTimeMillis() - start);
+//            logger.info("rtt:" +rtt);
+//            MyConf.active--;
+//            result.setAttachment("activeTask", String.valueOf(MyConf.active));
             return result;
         } catch (Exception e) {
             throw e;
