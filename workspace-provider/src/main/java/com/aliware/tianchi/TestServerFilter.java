@@ -30,7 +30,7 @@ public class TestServerFilter implements Filter {
             if (MyConf.max.get() < MyConf.active.decrementAndGet()) {
                 MyConf.max.set(MyConf.poolSize.get());
             }
-            long remain = MyConf.max.get() - MyConf.active.decrementAndGet();
+            long remain = MyConf.max.get() - MyConf.active.get();
 //            logger.info("rtt:" +rtt);
 //            MyConf.active--;
             result.setAttachment("useful", String.valueOf(remain));
