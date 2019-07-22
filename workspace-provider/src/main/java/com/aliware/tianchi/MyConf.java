@@ -12,6 +12,7 @@ public class MyConf {
 
 
     public static  AtomicInteger active = new AtomicInteger(0);
-    public static long max;
+    public static AtomicInteger max = new AtomicInteger(0);
+    public static AtomicInteger poolSize = new AtomicInteger(0);
 
 }

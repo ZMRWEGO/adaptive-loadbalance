@@ -24,20 +24,16 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try {
-            long start = System.currentTimeMillis();
             //这里是同步调用
             Result result = invoker.invoke(invocation);
-            long rtt = (System.currentTimeMillis() - start);
             //     可用线程数/上一次rtt
-            long remain = MyConf.max - MyConf.active.decrementAndGet();
-            if (remain < 0.75 * MyConf.max) {
-                 useful = remain * 60 / rtt;
-            } else {
-                useful = remain;
-            }           
+            if (MyConf.max.get() < MyConf.active.decrementAndGet()) {
+                MyConf.max.set(MyConf.poolSize.get());
+            }
+            long remain = MyConf.max.get() - MyConf.active.decrementAndGet();
 //            logger.info("rtt:" +rtt);
 //            MyConf.active--;
-            result.setAttachment("useful", String.valueOf(useful));
+            result.setAttachment("useful", String.valueOf(remain));
             return result;
         } catch (Exception e) {
             throw e;
@@ -47,6 +43,9 @@ public class TestServerFilter implements Filter {
 
     @Override
     public Result onResponse(Result result, Invoker<?> invoker, Invocation invocation) {
+        if (result.getException() != null) {
+            MyConf.max.set(MyConf.active.get());
+        }
         return result;
     }
 

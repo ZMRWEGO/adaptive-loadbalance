@@ -32,7 +32,7 @@ public class TestRequestLimiter implements RequestLimiter {
         //第一次获取最大线程数
         isInit();
         try {
-            if(MyConf.active.getAndSet(activeTaskCount)==MyConf.max){
+            if(MyConf.active.getAndSet(activeTaskCount)==MyConf.max.get()){
                 Thread.sleep(10);
             }
         }catch (Exception e)
@@ -54,7 +54,8 @@ public class TestRequestLimiter implements RequestLimiter {
                     ExecutorService executor = (ExecutorService) map.getValue();
                     if (executor instanceof ThreadPoolExecutor) {
                         ThreadPoolExecutor tp = (ThreadPoolExecutor) executor;
-                        MyConf.max = tp.getMaximumPoolSize();
+                        MyConf.max.set(tp.getMaximumPoolSize());
+                        MyConf.poolSize.set(tp.getMaximumPoolSize());
                         //线程池
                     }
                 }
